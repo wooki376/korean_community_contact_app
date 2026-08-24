@@ -90,41 +90,34 @@
   .fab-mail{width:100%; display:flex; align-items:center; justify-content:center; gap:9px; background:var(--primary); color:#fff; border:none; border-radius:999px; padding:15px 20px; font-size:15.5px; font-weight:700; cursor:pointer; box-shadow:var(--shadow);}
   .fab-mail:active{transform:scale(0.98);}
   .fab-mail[disabled]{opacity:.5; pointer-events:none;}
-  .cat-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:6px 0 10px;}
-  .cat-card{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:18px 16px; cursor:pointer; transition:transform .12s ease; display:flex; flex-direction:column; gap:14px; min-height:112px; text-align:left;}
-  .cat-card:active{transform:scale(0.97);}
-  .cat-card-icon{width:42px; height:42px; border-radius:12px; display:flex; align-items:center; justify-content:center; background:var(--primary-soft); color:var(--primary-dark); flex:none;}
-  .cat-card-name{font-weight:800; font-size:16px; font-family:'Gothic A1','Noto Sans KR',sans-serif; line-height:1.3;}
-  .cat-card-cnt{font-size:12.5px; color:var(--ink-soft); font-weight:500; margin-top:2px;}
+  .org-block{margin-bottom:26px;}
+  .org-head{display:flex; align-items:center; justify-content:space-between; width:100%; background:none; border:none; border-bottom:2px solid var(--border); padding:2px 2px 10px; margin-bottom:10px; cursor:pointer; text-align:left;}
+  .org-head:active{opacity:.7;}
+  .org-name{font-size:19px; font-weight:800; font-family:'Gothic A1','Noto Sans KR',sans-serif; color:var(--ink);}
+  .org-cnt{font-size:12.5px; color:var(--ink-soft); font-weight:500; margin-left:8px;}
+  .org-empty-hint{font-size:13px; color:var(--ink-soft); padding:0 2px 4px; cursor:pointer;}
   .role-badge{font-size:11px; font-weight:700; color:var(--primary-dark); background:var(--primary-soft); padding:3px 8px; border-radius:999px; flex:none; white-space:nowrap;}
   .contact-meta{display:flex; align-items:center; gap:14px; margin-top:5px; flex-wrap:wrap; min-width:0;}
   .contact-meta span{display:flex; align-items:center; gap:5px; font-size:12.5px; color:var(--ink-soft); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:100%;}
   .contact-meta svg{flex:none; opacity:.75;}
   .overlay{position:fixed; inset:0; background:rgba(20,24,22,0.5); z-index:50; display:flex; align-items:flex-end; justify-content:center; opacity:0; pointer-events:none; transition:opacity .2s ease;}
   .overlay.open{opacity:1; pointer-events:auto;}
-  .sheet{width:100%; max-width:560px; background:var(--surface); border-radius:22px 22px 0 0; padding:10px 22px calc(24px + env(safe-area-inset-bottom)); transform:translateY(16px); transition:transform .22s ease; max-height:88vh; overflow-y:auto; box-shadow:var(--shadow);}
+  .sheet{position:relative; width:100%; max-width:480px; background:var(--surface); border-radius:22px 22px 0 0; padding:14px 26px calc(30px + env(safe-area-inset-bottom)); transform:translateY(16px); transition:transform .22s ease; max-height:88vh; overflow-y:auto; box-shadow:var(--shadow);}
   .overlay.open .sheet{transform:translateY(0);}
-  .sheet-handle{width:38px; height:4px; background:var(--border); border-radius:99px; margin:8px auto 14px;}
-  .sheet-head{display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:16px;}
-  .sheet-title{font-size:20px;}
-  .sheet-role{font-size:13.5px; color:var(--ink-soft); font-weight:600; margin-top:4px;}
-  .close-x{width:34px;height:34px;border-radius:999px;border:none;background:var(--surface-2); color:var(--ink-soft); display:flex; align-items:center; justify-content:center; cursor:pointer; flex:none;}
-  .field-card{display:flex; align-items:center; gap:12px; background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius-md); padding:13px 14px; margin-bottom:10px;}
-  .field-icon{width:38px; height:38px; border-radius:11px; display:flex; align-items:center; justify-content:center; flex:none;}
-  .field-icon.building{background:var(--primary-soft); color:var(--primary-dark);}
-  .field-icon.phone{background:var(--call-soft); color:var(--call);}
-  .field-icon.email{background:var(--mail-soft); color:var(--mail);}
-  .field-text{flex:1; min-width:0;}
-  .field-label{font-size:11.5px; color:var(--ink-soft); font-weight:600;}
-  .field-value{font-size:15px; font-weight:700; margin-top:1px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
-  .field-action{width:38px; height:38px; border-radius:999px; border:none; flex:none; display:flex; align-items:center; justify-content:center; cursor:pointer;}
-  .field-action.call{background:var(--call); color:#fff;}
-  .field-action.mail{background:var(--mail); color:#fff;}
-  .sheet-actions{display:flex; gap:10px; margin-top:18px;}
-  .btn{flex:1; padding:13px 16px; border-radius:999px; border:none; font-weight:700; font-size:14.5px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:7px;}
-  .btn.ghost{background:var(--surface-2); color:var(--ink); border:1px solid var(--border);}
-  .btn:active{transform:scale(0.97);}
-  .btn.full{width:100%;}
+  .sheet-handle{width:38px; height:4px; background:var(--border); border-radius:99px; margin:2px auto 6px;}
+  .close-x{position:absolute; top:16px; right:18px; width:34px; height:34px; border-radius:999px; border:none; background:var(--surface-2); color:var(--ink-soft); display:flex; align-items:center; justify-content:center; cursor:pointer; flex:none;}
+  .contact-avatar-lg{width:76px; height:76px; border-radius:50%; margin:14px auto 14px; display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff; font-size:27px; font-family:'Gothic A1',sans-serif;}
+  .contact-page-name{text-align:center; font-size:19px; font-weight:800; font-family:'Gothic A1','Noto Sans KR',sans-serif;}
+  .contact-page-org{text-align:center; font-size:13.5px; color:var(--ink-soft); margin-top:4px; margin-bottom:28px;}
+  .detail-row{display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:20px;}
+  .detail-row-text{min-width:0; flex:1;}
+  .detail-label{font-size:12.5px; color:var(--ink-soft); font-weight:600; margin-bottom:5px;}
+  .detail-value{font-size:17px; font-weight:700; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .detail-value.email{color:var(--mail);}
+  .detail-action{width:42px; height:42px; border-radius:999px; border:none; flex:none; display:flex; align-items:center; justify-content:center; cursor:pointer;}
+  .detail-action.call{background:var(--call-soft); color:var(--call);}
+  .detail-action.mail{background:var(--mail-soft); color:var(--mail);}
+  .detail-action:active{transform:scale(0.94);}
   .hint{font-size:12.5px; color:var(--ink-soft); margin-top:6px; line-height:1.5;}
   .toast{position:fixed; left:50%; bottom:26px; transform:translateX(-50%); background:var(--ink); color:var(--bg); padding:10px 18px; border-radius:999px; font-size:13.5px; font-weight:600; z-index:80; opacity:0; pointer-events:none; transition:opacity .25s ease, transform .25s ease; box-shadow:var(--shadow);}
   .toast.show{opacity:1; transform:translateX(-50%) translateY(-4px);}
@@ -150,7 +143,7 @@ var CONFIG = {
 var FALLBACK_DATA = {
   appTitle: "한인회 연락망",
   categories: [
-    { id: "cat-1", name: "한인회", contacts: [ { id: "s-1", name: "홍길동 (예시)", role: "회장 · 예시 데이터", phone: "", email: "" } ] },
+    { id: "cat-1", name: "한인회", contacts: [ { id: "s-1", name: "홍길동 (예시)", role: "회장 · 예시 데이터", phone: "", email: "", lead: true } ] },
     { id: "cat-2", name: "옥타 (OKTA)", contacts: [] },
     { id: "cat-3", name: "노인회", contacts: [] },
     { id: "cat-4", name: "상공인연합회", contacts: [] }
@@ -159,7 +152,7 @@ var FALLBACK_DATA = {
 
 var DATA = FALLBACK_DATA;
 
-var session = { view: 'home', query: '', categoryId: null, sheet: null };
+var session = { view: 'home', query: '', categoryId: null, contactId: null };
 
 /* ---------------- icons ---------------- */
 var ICON_MENU = '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>';
@@ -240,8 +233,9 @@ function slugify(str) {
 function csvRowsToCategories(rows) {
   if (!rows.length) return [];
   var header = rows[0].map(function (h) { return h.trim(); });
-  var idx = { cat: header.indexOf('카테고리'), name: header.indexOf('이름'), role: header.indexOf('역할'), phone: header.indexOf('전화번호'), email: header.indexOf('이메일') };
+  var idx = { cat: header.indexOf('카테고리'), name: header.indexOf('이름'), role: header.indexOf('역할'), phone: header.indexOf('전화번호'), email: header.indexOf('이메일'), lead: header.indexOf('대표') };
   if (idx.cat === -1 || idx.name === -1) return [];
+  var LEAD_TRUE = { 'y': 1, 'yes': 1, 'true': 1, '1': 1, 'o': 1, '예': 1, '대표': 1, '대장': 1 };
   var catMap = {}, order = [], counter = 0;
   for (var r = 1; r < rows.length; r++) {
     var row = rows[r];
@@ -251,7 +245,8 @@ function csvRowsToCategories(rows) {
     var name = (row[idx.name] || '').trim();
     if (!name) continue;
     counter++;
-    catMap[catName].push({ id: 'ct-' + counter, name: name, role: (idx.role > -1 ? (row[idx.role] || '').trim() : ''), phone: (idx.phone > -1 ? (row[idx.phone] || '').trim() : ''), email: (idx.email > -1 ? (row[idx.email] || '').trim() : '') });
+    var leadRaw = idx.lead > -1 ? (row[idx.lead] || '').trim().toLowerCase() : '';
+    catMap[catName].push({ id: 'ct-' + counter, name: name, role: (idx.role > -1 ? (row[idx.role] || '').trim() : ''), phone: (idx.phone > -1 ? (row[idx.phone] || '').trim() : ''), email: (idx.email > -1 ? (row[idx.email] || '').trim() : ''), lead: !!LEAD_TRUE[leadRaw] });
   }
   return order.map(function (catName) { return { id: 'cat-' + slugify(catName), name: catName, contacts: catMap[catName] }; });
 }
@@ -310,24 +305,23 @@ function render() {
   var app = document.getElementById('app');
   app.innerHTML = renderShell();
   var ov = ensureOverlayRoot();
-  if (session.sheet) {
-    ov.innerHTML = '<div class="sheet">' + renderSheetContent() + '</div>';
+  if (session.contactId) {
+    ov.innerHTML = '<div class="sheet">' + renderContactSheetContent() + '</div>';
     requestAnimationFrame(function () { ov.classList.add('open'); });
   } else {
     ov.classList.remove('open');
-    setTimeout(function () { if (!session.sheet) ov.innerHTML = ''; }, 260);
+    setTimeout(function () { if (!session.contactId) ov.innerHTML = ''; }, 260);
   }
 }
 function ensureOverlayRoot() {
   var el = document.getElementById('overlay-root');
   if (!el) {
     el = document.createElement('div'); el.id = 'overlay-root'; el.className = 'overlay';
-    el.addEventListener('click', function (e) { if (e.target === el) closeSheet(); });
+    el.addEventListener('click', function (e) { if (e.target === el) closeContact(); });
     document.body.appendChild(el);
   }
   return el;
 }
-function closeSheet() { session.sheet = null; render(); }
 window.addEventListener('scroll', function () {
   var tb = document.getElementById('topbar');
   if (tb) { if (window.scrollY > 4) tb.classList.add('scrolled'); else tb.classList.remove('scrolled'); }
@@ -340,14 +334,19 @@ function renderHomeBody() {
     return '<div class="empty-state">' + ICON_EMPTY + '<p>아직 등록된 카테고리가 없어요.</p></div>';
   }
   if (!q) {
-    return '<div class="cat-grid">' + DATA.categories.map(function (cat) {
+    return DATA.categories.map(function (cat) {
+      var leaders = cat.contacts.filter(function (c) { return c.lead; });
       return (
-        '<button class="cat-card" onclick="openCategory(\'' + cat.id + '\')">' +
-          '<div class="cat-card-icon">' + ICON_BUILDING + '</div>' +
-          '<div><div class="cat-card-name">' + escapeHtml(cat.name) + '</div><div class="cat-card-cnt">' + cat.contacts.length + '명</div></div>' +
-        '</button>'
+        '<div class="org-block">' +
+          '<button class="org-head" onclick="openCategory(\'' + cat.id + '\')">' +
+            '<span><span class="org-name">' + escapeHtml(cat.name) + '</span><span class="org-cnt">' + cat.contacts.length + '명</span></span>' +
+            '<span class="chev">' + ICON_CHEV + '</span>' +
+          '</button>' +
+          (leaders.length ? leaders.map(function (c) { return renderContactRowDetail(c, cat.id); }).join('')
+            : '<p class="org-empty-hint" onclick="openCategory(\'' + cat.id + '\')">등록된 대표자가 없어요. 눌러서 전체 명단 보기</p>') +
+        '</div>'
       );
-    }).join('') + '</div>';
+    }).join('');
   }
   /* searching from the home screen: show matches grouped by category, across everything */
   var sections = DATA.categories.map(function (cat) {
@@ -444,11 +443,11 @@ function sendMailToEveryone() {
   if (href) location.href = href;
 }
 function openCategory(catId) {
-  session.view = 'category'; session.categoryId = catId; session.query = '';
+  session.view = 'category'; session.categoryId = catId; session.query = ''; session.contactId = null;
   render();
 }
 function backToHome() {
-  session.view = 'home'; session.categoryId = null; session.query = '';
+  session.view = 'home'; session.categoryId = null; session.query = ''; session.contactId = null;
   render();
 }
 
@@ -466,25 +465,32 @@ function sendGroupMail(categoryId) {
   if (href) location.href = href;
 }
 
-/* ---------------- sheet ---------------- */
-function openContact(categoryId, contactId) { session.sheet = { type: 'contact', categoryId: categoryId, contactId: contactId }; render(); }
-function renderSheetContent() {
-  if (!session.sheet) return '';
-  if (session.sheet.type === 'contact') return renderContactSheetContent();
-  return '';
+/* ---------------- contact detail (popup sheet over the current screen) ---------------- */
+function openContact(categoryId, contactId) {
+  session.categoryId = categoryId;
+  session.contactId = contactId;
+  render();
+}
+function closeContact() {
+  session.contactId = null;
+  render();
 }
 function renderContactSheetContent() {
-  var categoryId = session.sheet.categoryId, contactId = session.sheet.contactId;
-  var cat = findCategory(categoryId), c = cat && findContact(cat, contactId);
-  if (!cat || !c) return '<div class="sheet-handle"></div><p>연락처를 찾을 수 없어요.</p>';
+  var cat = findCategory(session.categoryId), c = cat && findContact(cat, session.contactId);
+  if (!cat || !c) {
+    return '<div class="sheet-handle"></div><button class="close-x" onclick="closeContact()" aria-label="닫기">' + ICON_CLOSE + '</button><p class="hint">연락처를 찾을 수 없어요.</p>';
+  }
+  var tel = telHref(c.phone), mail = mailHref(c.email);
+  var titleLine = c.name + (c.role ? ' ' + c.role : '');
   return (
     '<div class="sheet-handle"></div>' +
-    '<div class="sheet-head"><div><div class="sheet-title">' + escapeHtml(c.name) + '</div>' + (c.role ? '<div class="sheet-role">' + escapeHtml(c.role) + '</div>' : '') + '</div><button class="close-x" onclick="closeSheet()" aria-label="닫기">' + ICON_CLOSE + '</button></div>' +
-    '<div class="field-card"><div class="field-icon building">' + ICON_BUILDING + '</div><div class="field-text"><div class="field-label">단체</div><div class="field-value">' + escapeHtml(cat.name) + '</div></div></div>' +
-    (c.role ? '<div class="field-card"><div class="field-icon building">' + ICON_ROLE + '</div><div class="field-text"><div class="field-label">직함</div><div class="field-value">' + escapeHtml(c.role) + '</div></div></div>' : '') +
-    (c.phone ? '<div class="field-card"><div class="field-icon phone">' + ICON_CALL + '</div><div class="field-text"><div class="field-label">전화번호</div><div class="field-value tabular">' + escapeHtml(c.phone) + '</div></div><button class="field-action call" onclick="callContact(\'' + categoryId + '\',\'' + contactId + '\')" aria-label="전화 걸기">' + ICON_CALL + '</button></div>' : '') +
-    (c.email ? '<div class="field-card"><div class="field-icon email">' + ICON_MAIL + '</div><div class="field-text"><div class="field-label">이메일</div><div class="field-value">' + escapeHtml(c.email) + '</div></div><button class="field-action mail" onclick="emailContact(\'' + categoryId + '\',\'' + contactId + '\')" aria-label="이메일 보내기">' + ICON_MAIL + '</button></div>' : '') +
-    ((!c.phone && !c.email) ? '<p class="hint">등록된 전화번호나 이메일이 없어요.</p>' : '')
+    '<button class="close-x" onclick="closeContact()" aria-label="닫기">' + ICON_CLOSE + '</button>' +
+    '<div class="contact-avatar-lg" style="background:' + colorForString(c.name) + '">' + escapeHtml(initials(c.name)) + '</div>' +
+    '<div class="contact-page-name">' + escapeHtml(titleLine) + '</div>' +
+    '<div class="contact-page-org">' + escapeHtml(cat.name) + '</div>' +
+    (tel ? '<div class="detail-row"><div class="detail-row-text"><div class="detail-label">연락처</div><div class="detail-value tabular">' + escapeHtml(c.phone) + '</div></div><button class="detail-action call" onclick="callContact(\'' + cat.id + '\',\'' + c.id + '\')" aria-label="전화 걸기">' + ICON_CALL + '</button></div>' : '') +
+    (mail ? '<div class="detail-row"><div class="detail-row-text"><div class="detail-label">이메일</div><div class="detail-value email">' + escapeHtml(c.email) + '</div></div><button class="detail-action mail" onclick="emailContact(\'' + cat.id + '\',\'' + c.id + '\')" aria-label="이메일 보내기">' + ICON_MAIL + '</button></div>' : '') +
+    ((!tel && !mail) ? '<p class="hint" style="text-align:center;">등록된 전화번호나 이메일이 없어요.</p>' : '')
   );
 }
 
