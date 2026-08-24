@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="한인회 연락망">
+<meta name="theme-color" content="#1F6F5C">
+<meta name="robots" content="noindex, nofollow">
+<title>한인회 연락망</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231F6F5C' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='4' width='20' height='16' rx='2'/%3E%3Cpath d='m22 6-10 7L2 6'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@500;700;800&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F6F2EA; --surface:#FFFFFF; --surface-2:#FBF8F1;
+    --ink:#23302B; --ink-soft:#5C6A63; --border:#E4DCC9;
+    --primary:#1F6F5C; --primary-dark:#154E40; --primary-soft:#E4EEEA;
+    --call:#2E9E5B; --call-soft:#E4F5EA;
+    --mail:#2B6CB0; --mail-soft:#E6EEF8;
+    --danger:#C0402E; --danger-soft:#FBEAE7;
+    --shadow: 0 8px 24px -12px rgba(35,48,43,0.28);
+    --radius-lg:20px; --radius-md:14px; --radius-sm:10px;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#141F1B; --surface:#1B2A25; --surface-2:#20302A;
+      --ink:#ECE6D9; --ink-soft:#AFC0B7; --border:#2E4239;
+      --primary:#4FBFA0; --primary-dark:#7CD9BE; --primary-soft:#203832;
+      --call:#4FCB84; --call-soft:#1C3A2A;
+      --mail:#7FB2E8; --mail-soft:#1D2F42;
+      --danger:#E2695A; --danger-soft:#3A211E;
+      --shadow: 0 8px 28px -12px rgba(0,0,0,0.55);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#141F1B; --surface:#1B2A25; --surface-2:#20302A;
+    --ink:#ECE6D9; --ink-soft:#AFC0B7; --border:#2E4239;
+    --primary:#4FBFA0; --primary-dark:#7CD9BE; --primary-soft:#203832;
+    --call:#4FCB84; --call-soft:#1C3A2A;
+    --mail:#7FB2E8; --mail-soft:#1D2F42;
+    --danger:#E2695A; --danger-soft:#3A211E;
+    --shadow: 0 8px 28px -12px rgba(0,0,0,0.55);
+    color-scheme: dark;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--bg); color:var(--ink); font-family:'Noto Sans KR', system-ui, -apple-system, 'Malgun Gothic', sans-serif; -webkit-font-smoothing:antialiased; min-height:100vh; overflow-x:hidden;}
+  h1,h2,.display{font-family:'Gothic A1','Noto Sans KR',system-ui,sans-serif; font-weight:800; letter-spacing:-0.01em; text-wrap:balance; margin:0;}
+  button{font-family:inherit;}
+  a{color:inherit;}
+  .tabular{font-variant-numeric:tabular-nums;}
+  #app{max-width:560px; margin:0 auto; min-height:100vh; background:var(--bg); position:relative; padding-bottom:32px;}
+  .topbar{position:sticky; top:0; z-index:20; background:var(--bg); padding:18px 18px 10px; border-bottom:1px solid transparent;}
+  .topbar.scrolled{border-bottom-color:var(--border);}
+  .brand-row{display:grid; grid-template-columns:40px 1fr 40px; align-items:center; gap:10px; margin-bottom:14px;}
+  .brand{font-size:20px; text-align:center; grid-column:2;}
+  .icon-btn{display:inline-flex; align-items:center; justify-content:center; width:40px; height:40px; border-radius:999px; border:1px solid var(--border); background:var(--surface); color:var(--ink); cursor:pointer; flex:none; transition:transform .15s ease;}
+  .icon-btn:active{transform:scale(0.94);}
+  .search-wrap{position:relative; margin-bottom:12px;}
+  .search-wrap input{width:100%; padding:12px 14px 12px 40px; border-radius:999px; border:1px solid var(--border); background:var(--surface); color:var(--ink); font-size:15px; outline:none;}
+  .search-wrap input:focus{border-color:var(--primary);}
+  .search-wrap svg{position:absolute; left:13px; top:50%; transform:translateY(-50%); color:var(--ink-soft);}
+  main{padding:6px 18px 100px;}
+  .section-head{display:flex; align-items:center; justify-content:space-between; gap:8px; margin:22px 2px 10px; scroll-margin-top:150px;}
+  .section-head h2{font-size:16px; font-weight:800; font-family:'Gothic A1','Noto Sans KR',sans-serif;}
+  .section-head .cnt{font-size:12.5px; color:var(--ink-soft); font-weight:500; margin-left:6px;}
+  .section-mail{width:32px; height:32px; border-radius:999px; border:none; background:var(--mail-soft); color:var(--mail); display:flex; align-items:center; justify-content:center; cursor:pointer; flex:none;}
+  .contact-row{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-md); padding:13px 14px; display:flex; align-items:center; gap:12px; margin-bottom:9px; cursor:pointer; transition:transform .12s ease;}
+  .contact-row:active{transform:scale(0.985);}
+  .contact-avatar{width:44px; height:44px; border-radius:999px; flex:none; display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff; font-size:15px; font-family:'Gothic A1',sans-serif;}
+  .contact-main{flex:1; min-width:0;}
+  .contact-name-row{display:flex; align-items:center; gap:7px; flex-wrap:wrap;}
+  .contact-name{font-weight:700; font-size:15.5px;}
+  .contact-sub{font-size:13px; color:var(--ink-soft); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .row-actions{display:flex; gap:6px; flex:none;}
+  .mini-btn{width:36px; height:36px; border-radius:999px; border:none; display:flex; align-items:center; justify-content:center; cursor:pointer; flex:none;}
+  .mini-btn.call{background:var(--call-soft); color:var(--call);}
+  .mini-btn.mail{background:var(--mail-soft); color:var(--mail);}
+  .chev{color:var(--ink-soft); flex:none;}
+  .empty-state{text-align:center; padding:48px 20px; color:var(--ink-soft);}
+  .empty-state svg{margin-bottom:12px; opacity:.6;}
+  .empty-state p{font-size:14.5px; line-height:1.6;}
+  .fab-bar{position:sticky; bottom:0; left:0; right:0; z-index:15; padding:14px 18px calc(14px + env(safe-area-inset-bottom)); background:linear-gradient(to top, var(--bg) 60%, transparent);}
+  .fab-mail{width:100%; display:flex; align-items:center; justify-content:center; gap:9px; background:var(--primary); color:#fff; border:none; border-radius:999px; padding:15px 20px; font-size:15.5px; font-weight:700; cursor:pointer; box-shadow:var(--shadow);}
+  .fab-mail:active{transform:scale(0.98);}
+  .fab-mail[disabled]{opacity:.5; pointer-events:none;}
+  .cat-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:6px 0 10px;}
+  .cat-card{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:18px 16px; cursor:pointer; transition:transform .12s ease; display:flex; flex-direction:column; gap:14px; min-height:112px; text-align:left;}
+  .cat-card:active{transform:scale(0.97);}
+  .cat-card-icon{width:42px; height:42px; border-radius:12px; display:flex; align-items:center; justify-content:center; background:var(--primary-soft); color:var(--primary-dark); flex:none;}
+  .cat-card-name{font-weight:800; font-size:16px; font-family:'Gothic A1','Noto Sans KR',sans-serif; line-height:1.3;}
+  .cat-card-cnt{font-size:12.5px; color:var(--ink-soft); font-weight:500; margin-top:2px;}
+  .role-badge{font-size:11px; font-weight:700; color:var(--primary-dark); background:var(--primary-soft); padding:3px 8px; border-radius:999px; flex:none; white-space:nowrap;}
+  .contact-meta{display:flex; align-items:center; gap:14px; margin-top:5px; flex-wrap:wrap; min-width:0;}
+  .contact-meta span{display:flex; align-items:center; gap:5px; font-size:12.5px; color:var(--ink-soft); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:100%;}
+  .contact-meta svg{flex:none; opacity:.75;}
+  .overlay{position:fixed; inset:0; background:rgba(20,24,22,0.5); z-index:50; display:flex; align-items:flex-end; justify-content:center; opacity:0; pointer-events:none; transition:opacity .2s ease;}
+  .overlay.open{opacity:1; pointer-events:auto;}
+  .sheet{width:100%; max-width:560px; background:var(--surface); border-radius:22px 22px 0 0; padding:10px 22px calc(24px + env(safe-area-inset-bottom)); transform:translateY(16px); transition:transform .22s ease; max-height:88vh; overflow-y:auto; box-shadow:var(--shadow);}
+  .overlay.open .sheet{transform:translateY(0);}
+  .sheet-handle{width:38px; height:4px; background:var(--border); border-radius:99px; margin:8px auto 14px;}
+  .sheet-head{display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:16px;}
+  .sheet-title{font-size:20px;}
+  .sheet-role{font-size:13.5px; color:var(--ink-soft); font-weight:600; margin-top:4px;}
+  .close-x{width:34px;height:34px;border-radius:999px;border:none;background:var(--surface-2); color:var(--ink-soft); display:flex; align-items:center; justify-content:center; cursor:pointer; flex:none;}
+  .field-card{display:flex; align-items:center; gap:12px; background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius-md); padding:13px 14px; margin-bottom:10px;}
+  .field-icon{width:38px; height:38px; border-radius:11px; display:flex; align-items:center; justify-content:center; flex:none;}
+  .field-icon.building{background:var(--primary-soft); color:var(--primary-dark);}
+  .field-icon.phone{background:var(--call-soft); color:var(--call);}
+  .field-icon.email{background:var(--mail-soft); color:var(--mail);}
+  .field-text{flex:1; min-width:0;}
+  .field-label{font-size:11.5px; color:var(--ink-soft); font-weight:600;}
+  .field-value{font-size:15px; font-weight:700; margin-top:1px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .field-action{width:38px; height:38px; border-radius:999px; border:none; flex:none; display:flex; align-items:center; justify-content:center; cursor:pointer;}
+  .field-action.call{background:var(--call); color:#fff;}
+  .field-action.mail{background:var(--mail); color:#fff;}
+  .sheet-actions{display:flex; gap:10px; margin-top:18px;}
+  .btn{flex:1; padding:13px 16px; border-radius:999px; border:none; font-weight:700; font-size:14.5px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:7px;}
+  .btn.ghost{background:var(--surface-2); color:var(--ink); border:1px solid var(--border);}
+  .btn:active{transform:scale(0.97);}
+  .btn.full{width:100%;}
+  .hint{font-size:12.5px; color:var(--ink-soft); margin-top:6px; line-height:1.5;}
+  .toast{position:fixed; left:50%; bottom:26px; transform:translateX(-50%); background:var(--ink); color:var(--bg); padding:10px 18px; border-radius:999px; font-size:13.5px; font-weight:600; z-index:80; opacity:0; pointer-events:none; transition:opacity .25s ease, transform .25s ease; box-shadow:var(--shadow);}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(-4px);}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast" class="toast"></div>
+<script>
+/* =====================================================================
+   한인회 연락망 — Google 시트를 데이터 소스로 쓰는 정적 버전 (GitHub Pages용)
+
+   아래 CONFIG.sheetCsvUrl 한 줄만 채우면 구글 시트 내용을 그대로 불러와요.
+   시트를 "링크가 있는 모든 사용자 = 뷰어"로 공유한 뒤, 아래 형식의 주소를
+   여기에 넣어주세요:
+     https://docs.google.com/spreadsheets/d/{시트ID}/gviz/tq?tqx=out:csv&sheet={시트탭이름}
+   (시트ID는 시트 주소의 /d/ 와 /edit 사이 문자열, 시트탭이름은 하단 탭 이름 — 기본은 "시트1")
+   ===================================================================== */
+var CONFIG = {
+  sheetCsvUrl: "" // 예: "https://docs.google.com/spreadsheets/d/1AbCdE.../gviz/tq?tqx=out:csv&sheet=시트1"
+};
+
+var FALLBACK_DATA = {
+  appTitle: "한인회 연락망",
+  categories: [
+    { id: "cat-1", name: "한인회", contacts: [ { id: "s-1", name: "홍길동 (예시)", role: "회장 · 예시 데이터", phone: "", email: "" } ] },
+    { id: "cat-2", name: "옥타 (OKTA)", contacts: [] },
+    { id: "cat-3", name: "노인회", contacts: [] },
+    { id: "cat-4", name: "상공인연합회", contacts: [] }
+  ]
+};
+
+var DATA = FALLBACK_DATA;
+
+var session = { view: 'home', query: '', categoryId: null, sheet: null };
+
+/* ---------------- icons ---------------- */
+var ICON_MENU = '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>';
+var ICON_ROLE = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>';
+var ICON_CALL = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>';
+var ICON_MAIL = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></svg>';
+var ICON_CLOSE = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+var ICON_CHEV = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
+var ICON_BACK = '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>';
+var ICON_BUILDING = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="1"/><line x1="9" y1="6" x2="9" y2="6.01"/><line x1="15" y1="6" x2="15" y2="6.01"/><line x1="9" y1="10" x2="9" y2="10.01"/><line x1="15" y1="10" x2="15" y2="10.01"/><line x1="9" y1="14" x2="9" y2="14.01"/><line x1="15" y1="14" x2="15" y2="14.01"/></svg>';
+var ICON_EMPTY = '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>';
+var AVATAR_PALETTE = ['#1F6F5C', '#2B6CB0', '#E08E2B', '#7A5CC7', '#C0402E', '#0E8C8C', '#B0793C', '#4A6FA5'];
+
+/* ---------------- utils ---------------- */
+function escapeHtml(str) {
+  return String(str == null ? '' : str).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+function initials(name) {
+  var trimmed = (name || '').trim();
+  if (!trimmed) return '?';
+  var first = trimmed[0];
+  if (/[가-힣]/.test(first)) return first;
+  var parts = trimmed.split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+  return trimmed.slice(0, 2).toUpperCase();
+}
+function colorForString(str) {
+  var h = 0, s = String(str || '');
+  for (var i = 0; i < s.length; i++) { h = (h * 31 + s.charCodeAt(i)) >>> 0; }
+  return AVATAR_PALETTE[h % AVATAR_PALETTE.length];
+}
+function telHref(phone) {
+  if (!phone) return null;
+  var cleaned = phone.replace(/[^0-9+]/g, '');
+  return cleaned ? 'tel:' + cleaned : null;
+}
+function mailHref(email) { return email ? 'mailto:' + email.trim() : null; }
+function groupMailHref(cat) {
+  var emails = cat.contacts.map(function (c) { return c.email; }).filter(Boolean);
+  if (!emails.length) return null;
+  var subject = encodeURIComponent('[' + cat.name + '] 안내 메일');
+  return 'mailto:' + emails.join(',') + '?subject=' + subject;
+}
+function allMailHref() {
+  var emails = [];
+  DATA.categories.forEach(function (cat) { cat.contacts.forEach(function (c) { if (c.email) emails.push(c.email); }); });
+  if (!emails.length) return null;
+  var subject = encodeURIComponent('[' + (DATA.appTitle || '한인회 연락망') + '] 안내 메일');
+  return 'mailto:' + emails.join(',') + '?subject=' + subject;
+}
+function findCategory(id) { return DATA.categories.find(function (c) { return c.id === id; }); }
+function findContact(cat, id) { return cat ? cat.contacts.find(function (c) { return c.id === id; }) : null; }
+
+/* ---------------- CSV parsing ---------------- */
+function parseCSV(text) {
+  var rows = [], row = [], field = '', inQuotes = false;
+  for (var i = 0; i < text.length; i++) {
+    var c = text[i];
+    if (inQuotes) {
+      if (c === '"') { if (text[i + 1] === '"') { field += '"'; i++; } else { inQuotes = false; } }
+      else { field += c; }
+    } else {
+      if (c === '"') { inQuotes = true; }
+      else if (c === ',') { row.push(field); field = ''; }
+      else if (c === '\n') { row.push(field); rows.push(row); row = []; field = ''; }
+      else if (c === '\r') { /* skip */ }
+      else { field += c; }
+    }
+  }
+  if (field.length || row.length) { row.push(field); rows.push(row); }
+  return rows.filter(function (r) { return r.length && r.some(function (v) { return v !== ''; }); });
+}
+function slugify(str) {
+  return String(str || '').trim().replace(/[^a-zA-Z0-9가-힣]+/g, '-').replace(/^-+|-+$/g, '') || 'cat';
+}
+function csvRowsToCategories(rows) {
+  if (!rows.length) return [];
+  var header = rows[0].map(function (h) { return h.trim(); });
+  var idx = { cat: header.indexOf('카테고리'), name: header.indexOf('이름'), role: header.indexOf('역할'), phone: header.indexOf('전화번호'), email: header.indexOf('이메일') };
+  if (idx.cat === -1 || idx.name === -1) return [];
+  var catMap = {}, order = [], counter = 0;
+  for (var r = 1; r < rows.length; r++) {
+    var row = rows[r];
+    var catName = (row[idx.cat] || '').trim();
+    if (!catName) continue;
+    if (!catMap[catName]) { catMap[catName] = []; order.push(catName); }
+    var name = (row[idx.name] || '').trim();
+    if (!name) continue;
+    counter++;
+    catMap[catName].push({ id: 'ct-' + counter, name: name, role: (idx.role > -1 ? (row[idx.role] || '').trim() : ''), phone: (idx.phone > -1 ? (row[idx.phone] || '').trim() : ''), email: (idx.email > -1 ? (row[idx.email] || '').trim() : '') });
+  }
+  return order.map(function (catName) { return { id: 'cat-' + slugify(catName), name: catName, contacts: catMap[catName] }; });
+}
+
+/* ---------------- data loading ---------------- */
+var CACHE_KEY = 'gigroster-data-v1';
+function loadCache() { try { var raw = localStorage.getItem(CACHE_KEY); return raw ? JSON.parse(raw) : null; } catch (e) { return null; } }
+function saveCache(data) { try { localStorage.setItem(CACHE_KEY, JSON.stringify({ data: data, at: Date.now() })); } catch (e) { } }
+
+function loadData() {
+  var cached = loadCache();
+  if (cached && cached.data) { DATA = cached.data; }
+  if (!CONFIG.sheetCsvUrl) {
+    if (!cached) DATA = FALLBACK_DATA;
+    render();
+    return;
+  }
+  var url = CONFIG.sheetCsvUrl + (CONFIG.sheetCsvUrl.indexOf('?') > -1 ? '&' : '?') + '_=' + Date.now();
+  fetch(url, { cache: 'no-store' }).then(function (res) {
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return res.text();
+  }).then(function (text) {
+    var categories = csvRowsToCategories(parseCSV(text));
+    if (!categories.length) throw new Error('빈 데이터');
+    DATA = { appTitle: FALLBACK_DATA.appTitle, categories: categories };
+    saveCache(DATA);
+    render();
+  }).catch(function (err) {
+    console.error('sheet load failed', err);
+    if (!cached) { DATA = FALLBACK_DATA; render(); }
+  });
+}
+
+/* ---------------- toast ---------------- */
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(function () { t.classList.remove('show'); }, 2200);
+}
+
+/* ---------------- search ---------------- */
+/* IMPORTANT: typing must never rebuild the <input id="search-input">
+   element itself — replacing that DOM node mid-keystroke is what breaks
+   a Korean/Japanese/Chinese IME's composition and splits 홍길동 into
+   ㅎㅗㅇㄱㅣㄹㄷㅗㅇ. So oninput only refreshes the results container
+   below it (#directory-body), never the shell/input around it. */
+function onSearchInput(v) {
+  session.query = v;
+  if (session.view === 'category') updateCategoryBody(); else updateHomeBody();
+}
+
+/* ---------------- render: shell ---------------- */
+function render() {
+  var app = document.getElementById('app');
+  app.innerHTML = renderShell();
+  var ov = ensureOverlayRoot();
+  if (session.sheet) {
+    ov.innerHTML = '<div class="sheet">' + renderSheetContent() + '</div>';
+    requestAnimationFrame(function () { ov.classList.add('open'); });
+  } else {
+    ov.classList.remove('open');
+    setTimeout(function () { if (!session.sheet) ov.innerHTML = ''; }, 260);
+  }
+}
+function ensureOverlayRoot() {
+  var el = document.getElementById('overlay-root');
+  if (!el) {
+    el = document.createElement('div'); el.id = 'overlay-root'; el.className = 'overlay';
+    el.addEventListener('click', function (e) { if (e.target === el) closeSheet(); });
+    document.body.appendChild(el);
+  }
+  return el;
+}
+function closeSheet() { session.sheet = null; render(); }
+window.addEventListener('scroll', function () {
+  var tb = document.getElementById('topbar');
+  if (tb) { if (window.scrollY > 4) tb.classList.add('scrolled'); else tb.classList.remove('scrolled'); }
+}, { passive: true });
+
+/* ---------------- render: home (category grid) ---------------- */
+function renderHomeBody() {
+  var q = session.query.trim().toLowerCase();
+  if (!DATA.categories.length) {
+    return '<div class="empty-state">' + ICON_EMPTY + '<p>아직 등록된 카테고리가 없어요.</p></div>';
+  }
+  if (!q) {
+    return '<div class="cat-grid">' + DATA.categories.map(function (cat) {
+      return (
+        '<button class="cat-card" onclick="openCategory(\'' + cat.id + '\')">' +
+          '<div class="cat-card-icon">' + ICON_BUILDING + '</div>' +
+          '<div><div class="cat-card-name">' + escapeHtml(cat.name) + '</div><div class="cat-card-cnt">' + cat.contacts.length + '명</div></div>' +
+        '</button>'
+      );
+    }).join('') + '</div>';
+  }
+  /* searching from the home screen: show matches grouped by category, across everything */
+  var sections = DATA.categories.map(function (cat) {
+    var contacts = cat.contacts.filter(function (c) {
+      return c.name.toLowerCase().indexOf(q) !== -1 || (c.role || '').toLowerCase().indexOf(q) !== -1 || cat.name.toLowerCase().indexOf(q) !== -1;
+    });
+    return { cat: cat, contacts: contacts };
+  }).filter(function (s) { return s.contacts.length; });
+  if (!sections.length) {
+    return '<div class="empty-state">' + ICON_EMPTY + '<p>"' + escapeHtml(session.query.trim()) + '" 검색 결과가 없어요.</p></div>';
+  }
+  return sections.map(function (s) {
+    return (
+      '<div class="section-head"><h2>' + escapeHtml(s.cat.name) + '<span class="cnt">' + s.contacts.length + '명</span></h2></div>' +
+      s.contacts.map(function (c) { return renderContactRowDetail(c, s.cat.id); }).join('')
+    );
+  }).join('');
+}
+function updateHomeBody() {
+  var el = document.getElementById('directory-body');
+  if (el) el.innerHTML = renderHomeBody();
+}
+function renderHomeShell() {
+  var allMail = allMailHref();
+  return (
+    '<div class="topbar" id="topbar">' +
+      '<div class="brand-row"><span></span>' +
+        '<h1 class="brand">' + escapeHtml(DATA.appTitle || '한인회 연락망') + '</h1>' +
+        '<span></span>' +
+      '</div>' +
+      '<div class="search-wrap"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>' +
+      '<input type="text" id="search-input" placeholder="이름, 단체, 직함 검색" value="' + escapeHtml(session.query) + '" oninput="onSearchInput(this.value)"></div>' +
+    '</div>' +
+    '<main id="directory-body" style="padding-bottom:0;">' + renderHomeBody() + '</main>' +
+    '<div class="fab-bar"><button class="fab-mail" ' + (allMail ? '' : 'disabled') + ' onclick="' + (allMail ? 'sendMailToEveryone()' : '') + '">' + ICON_MAIL + ' 전체 메일 발송' + (allMail ? '' : ' (등록된 이메일 없음)') + '</button></div>'
+  );
+}
+
+/* ---------------- render: category detail (drill-in) ---------------- */
+function renderCategoryBody(cat) {
+  var q = session.query.trim().toLowerCase();
+  var contacts = q ? cat.contacts.filter(function (c) {
+    return c.name.toLowerCase().indexOf(q) !== -1 || (c.role || '').toLowerCase().indexOf(q) !== -1;
+  }) : cat.contacts;
+  if (!cat.contacts.length) {
+    return '<div class="empty-state">' + ICON_EMPTY + '<p>아직 등록된 연락처가 없어요.</p></div>';
+  }
+  if (q && !contacts.length) {
+    return '<div class="empty-state">' + ICON_EMPTY + '<p>"' + escapeHtml(session.query.trim()) + '" 검색 결과가 없어요.</p></div>';
+  }
+  return contacts.map(function (c) { return renderContactRowDetail(c, cat.id); }).join('');
+}
+function updateCategoryBody() {
+  var cat = findCategory(session.categoryId);
+  var el = document.getElementById('directory-body');
+  if (el && cat) el.innerHTML = renderCategoryBody(cat);
+}
+function renderCategoryShell() {
+  var cat = findCategory(session.categoryId);
+  if (!cat) { session.view = 'home'; session.categoryId = null; return renderHomeShell(); }
+  var gmail = groupMailHref(cat);
+  return (
+    '<div class="topbar" id="topbar">' +
+      '<div class="brand-row">' +
+        '<button class="icon-btn" onclick="backToHome()" aria-label="뒤로">' + ICON_BACK + '</button>' +
+        '<h1 class="brand">' + escapeHtml(cat.name) + '</h1>' +
+        (gmail ? '<button class="icon-btn" onclick="sendGroupMail(\'' + cat.id + '\')" aria-label="' + escapeHtml(cat.name) + ' 전체에게 메일">' + ICON_MAIL + '</button>' : '<span></span>') +
+      '</div>' +
+      '<div class="search-wrap"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>' +
+      '<input type="text" id="search-input" placeholder="이름, 직함 검색" value="' + escapeHtml(session.query) + '" oninput="onSearchInput(this.value)"></div>' +
+    '</div>' +
+    '<main id="directory-body" style="padding-bottom:0;">' + renderCategoryBody(cat) + '</main>'
+  );
+}
+
+/* ---------------- render: shell dispatch ---------------- */
+function renderShell() {
+  return session.view === 'category' ? renderCategoryShell() : renderHomeShell();
+}
+function renderContactRowDetail(c, categoryId) {
+  var tel = telHref(c.phone), mail = mailHref(c.email);
+  var meta = (tel ? '<span>' + ICON_CALL + escapeHtml(c.phone) + '</span>' : '') + (mail ? '<span>' + ICON_MAIL + escapeHtml(c.email) + '</span>' : '');
+  return (
+    '<div class="contact-row" onclick="openContact(\'' + categoryId + '\',\'' + c.id + '\')">' +
+      '<div class="contact-avatar" style="background:' + colorForString(c.name) + '">' + escapeHtml(initials(c.name)) + '</div>' +
+      '<div class="contact-main">' +
+        '<div class="contact-name-row"><span class="contact-name">' + escapeHtml(c.name) + '</span>' + (c.role ? '<span class="role-badge">' + escapeHtml(c.role) + '</span>' : '') + '</div>' +
+        (meta ? '<div class="contact-meta">' + meta + '</div>' : (!tel && !mail ? '<div class="contact-sub">연락처 정보 없음</div>' : '')) +
+      '</div><span class="chev">' + ICON_CHEV + '</span></div>'
+  );
+}
+function sendMailToEveryone() {
+  var href = allMailHref();
+  if (href) location.href = href;
+}
+function openCategory(catId) {
+  session.view = 'category'; session.categoryId = catId; session.query = '';
+  render();
+}
+function backToHome() {
+  session.view = 'home'; session.categoryId = null; session.query = '';
+  render();
+}
+
+/* ---------------- actions ---------------- */
+function callContact(categoryId, contactId) {
+  var cat = findCategory(categoryId), c = cat && findContact(cat, contactId), href = c && telHref(c.phone);
+  if (href) location.href = href; else showToast('등록된 전화번호가 없어요.');
+}
+function emailContact(categoryId, contactId) {
+  var cat = findCategory(categoryId), c = cat && findContact(cat, contactId), href = c && mailHref(c.email);
+  if (href) location.href = href; else showToast('등록된 이메일이 없어요.');
+}
+function sendGroupMail(categoryId) {
+  var cat = findCategory(categoryId), href = cat && groupMailHref(cat);
+  if (href) location.href = href;
+}
+
+/* ---------------- sheet ---------------- */
+function openContact(categoryId, contactId) { session.sheet = { type: 'contact', categoryId: categoryId, contactId: contactId }; render(); }
+function renderSheetContent() {
+  if (!session.sheet) return '';
+  if (session.sheet.type === 'contact') return renderContactSheetContent();
+  return '';
+}
+function renderContactSheetContent() {
+  var categoryId = session.sheet.categoryId, contactId = session.sheet.contactId;
+  var cat = findCategory(categoryId), c = cat && findContact(cat, contactId);
+  if (!cat || !c) return '<div class="sheet-handle"></div><p>연락처를 찾을 수 없어요.</p>';
+  return (
+    '<div class="sheet-handle"></div>' +
+    '<div class="sheet-head"><div><div class="sheet-title">' + escapeHtml(c.name) + '</div>' + (c.role ? '<div class="sheet-role">' + escapeHtml(c.role) + '</div>' : '') + '</div><button class="close-x" onclick="closeSheet()" aria-label="닫기">' + ICON_CLOSE + '</button></div>' +
+    '<div class="field-card"><div class="field-icon building">' + ICON_BUILDING + '</div><div class="field-text"><div class="field-label">단체</div><div class="field-value">' + escapeHtml(cat.name) + '</div></div></div>' +
+    (c.role ? '<div class="field-card"><div class="field-icon building">' + ICON_ROLE + '</div><div class="field-text"><div class="field-label">직함</div><div class="field-value">' + escapeHtml(c.role) + '</div></div></div>' : '') +
+    (c.phone ? '<div class="field-card"><div class="field-icon phone">' + ICON_CALL + '</div><div class="field-text"><div class="field-label">전화번호</div><div class="field-value tabular">' + escapeHtml(c.phone) + '</div></div><button class="field-action call" onclick="callContact(\'' + categoryId + '\',\'' + contactId + '\')" aria-label="전화 걸기">' + ICON_CALL + '</button></div>' : '') +
+    (c.email ? '<div class="field-card"><div class="field-icon email">' + ICON_MAIL + '</div><div class="field-text"><div class="field-label">이메일</div><div class="field-value">' + escapeHtml(c.email) + '</div></div><button class="field-action mail" onclick="emailContact(\'' + categoryId + '\',\'' + contactId + '\')" aria-label="이메일 보내기">' + ICON_MAIL + '</button></div>' : '') +
+    ((!c.phone && !c.email) ? '<p class="hint">등록된 전화번호나 이메일이 없어요.</p>' : '')
+  );
+}
+
+/* ---------------- boot ---------------- */
+loadData();
+</script>
+</body>
+</html>
