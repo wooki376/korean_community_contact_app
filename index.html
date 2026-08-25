@@ -7,46 +7,26 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="한인회 연락망">
-<meta name="theme-color" content="#1F6F5C">
+<meta name="theme-color" content="#166534">
 <meta name="robots" content="noindex, nofollow">
 <title>한인회 연락망</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231F6F5C' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='4' width='20' height='16' rx='2'/%3E%3Cpath d='m22 6-10 7L2 6'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23166534' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='4' width='20' height='16' rx='2'/%3E%3Cpath d='m22 6-10 7L2 6'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@500;700;800&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+  /* Color palette. Always a white background with a deep green accent (--primary) —
+     this app intentionally does NOT switch to a dark theme, regardless of device mode. */
   :root{
-    --bg:#F6F2EA; --surface:#FFFFFF; --surface-2:#FBF8F1;
+    --bg:#FFFFFF; --surface:#FFFFFF; --surface-2:#FBF8F1;
     --ink:#23302B; --ink-soft:#5C6A63; --border:#E4DCC9;
-    --primary:#1F6F5C; --primary-dark:#154E40; --primary-soft:#E4EEEA;
+    --primary:#166534; --primary-dark:#14532D; --primary-soft:#DCFCE7;
     --call:#2E9E5B; --call-soft:#E4F5EA;
     --mail:#2B6CB0; --mail-soft:#E6EEF8;
     --danger:#C0402E; --danger-soft:#FBEAE7;
     --shadow: 0 8px 24px -12px rgba(35,48,43,0.28);
     --radius-lg:20px; --radius-md:14px; --radius-sm:10px;
     color-scheme: light;
-  }
-  @media (prefers-color-scheme: dark){
-    :root:not([data-theme="light"]){
-      --bg:#141F1B; --surface:#1B2A25; --surface-2:#20302A;
-      --ink:#ECE6D9; --ink-soft:#AFC0B7; --border:#2E4239;
-      --primary:#4FBFA0; --primary-dark:#7CD9BE; --primary-soft:#203832;
-      --call:#4FCB84; --call-soft:#1C3A2A;
-      --mail:#7FB2E8; --mail-soft:#1D2F42;
-      --danger:#E2695A; --danger-soft:#3A211E;
-      --shadow: 0 8px 28px -12px rgba(0,0,0,0.55);
-      color-scheme: dark;
-    }
-  }
-  :root[data-theme="dark"]{
-    --bg:#141F1B; --surface:#1B2A25; --surface-2:#20302A;
-    --ink:#ECE6D9; --ink-soft:#AFC0B7; --border:#2E4239;
-    --primary:#4FBFA0; --primary-dark:#7CD9BE; --primary-soft:#203832;
-    --call:#4FCB84; --call-soft:#1C3A2A;
-    --mail:#7FB2E8; --mail-soft:#1D2F42;
-    --danger:#E2695A; --danger-soft:#3A211E;
-    --shadow: 0 8px 28px -12px rgba(0,0,0,0.55);
-    color-scheme: dark;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
@@ -86,8 +66,11 @@
   .empty-state{text-align:center; padding:48px 20px; color:var(--ink-soft);}
   .empty-state svg{margin-bottom:12px; opacity:.6;}
   .empty-state p{font-size:14.5px; line-height:1.6;}
+  /* The "Send Email to Everyone" bar pinned to the bottom of the home screen.
+     Uses its own fixed #006400 dark-green background (kept separate from --primary,
+     which stays a slightly different green for other accents like the search focus ring). */
   .fab-bar{position:sticky; bottom:0; left:0; right:0; z-index:15; padding:14px 18px calc(14px + env(safe-area-inset-bottom)); background:linear-gradient(to top, var(--bg) 60%, transparent);}
-  .fab-mail{width:100%; display:flex; align-items:center; justify-content:center; gap:9px; background:var(--primary); color:#fff; border:none; border-radius:999px; padding:15px 20px; font-size:15.5px; font-weight:700; cursor:pointer; box-shadow:var(--shadow);}
+  .fab-mail{width:100%; display:flex; align-items:center; justify-content:center; gap:9px; background:#006400; color:#fff; border:none; border-radius:999px; padding:15px 20px; font-size:15.5px; font-weight:700; cursor:pointer; box-shadow:var(--shadow);}
   .fab-mail:active{transform:scale(0.98);}
   .fab-mail[disabled]{opacity:.5; pointer-events:none;}
   .org-block{margin-bottom:26px;}
@@ -128,18 +111,23 @@
 <div id="toast" class="toast"></div>
 <script>
 /* =====================================================================
-   한인회 연락망 — Google 시트를 데이터 소스로 쓰는 정적 버전 (GitHub Pages용)
+   한인회 연락망 (Korean Society Contact Directory) — a static build that
+   reads its data from a published Google Sheet, meant for GitHub Pages.
 
-   아래 CONFIG.sheetCsvUrl 한 줄만 채우면 구글 시트 내용을 그대로 불러와요.
-   시트를 "링크가 있는 모든 사용자 = 뷰어"로 공유한 뒤, 아래 형식의 주소를
-   여기에 넣어주세요:
-     https://docs.google.com/spreadsheets/d/{시트ID}/gviz/tq?tqx=out:csv&sheet={시트탭이름}
-   (시트ID는 시트 주소의 /d/ 와 /edit 사이 문자열, 시트탭이름은 하단 탭 이름 — 기본은 "시트1")
+   Fill in CONFIG.sheetCsvUrl below and the app will pull the sheet's
+   content directly. Share the sheet as "Anyone with the link = Viewer",
+   then paste a URL of this shape:
+     https://docs.google.com/spreadsheets/d/{SHEET_ID}/gviz/tq?tqx=out:csv&sheet={TAB_NAME}
+   (SHEET_ID is the string between /d/ and /edit in the sheet's URL;
+   TAB_NAME is the sheet tab's name at the bottom — default is "시트1")
    ===================================================================== */
 var CONFIG = {
-  sheetCsvUrl: "" // 예: "https://docs.google.com/spreadsheets/d/1AbCdE.../gviz/tq?tqx=out:csv&sheet=시트1"
+  sheetCsvUrl: "" // e.g. "https://docs.google.com/spreadsheets/d/1AbCdE.../gviz/tq?tqx=out:csv&sheet=시트1"
 };
 
+// Sample data shown when no sheet is configured yet, or the sheet fails to load.
+// In real use this gets fully replaced by the Google Sheet (CSV) data; this stays
+// untouched as a fallback.
 var FALLBACK_DATA = {
   appTitle: "한인회 연락망",
   categories: [
@@ -150,11 +138,20 @@ var FALLBACK_DATA = {
   ]
 };
 
+// The data actually shown on screen. Starts out as the sample data, then gets
+// swapped for the real thing once loadData() successfully fetches the sheet.
 var DATA = FALLBACK_DATA;
 
+// Tracks which screen the app is currently showing.
+// view: 'home' (the organization list) or 'category' (one organization's full roster)
+// query: the current text typed into the search box
+// categoryId: the organization currently open (or that the open contact belongs to)
+// contactId: the contact currently shown in the popup (null = popup closed)
 var session = { view: 'home', query: '', categoryId: null, contactId: null };
 
 /* ---------------- icons ---------------- */
+/* Inline SVG icons reused throughout the app, kept as ready-made strings.
+   The variable name tells you what each one is (e.g. ICON_CALL = phone, ICON_MAIL = envelope). */
 var ICON_MENU = '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>';
 var ICON_ROLE = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>';
 var ICON_CALL = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>';
@@ -164,14 +161,20 @@ var ICON_CHEV = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" str
 var ICON_BACK = '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>';
 var ICON_BUILDING = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="1"/><line x1="9" y1="6" x2="9" y2="6.01"/><line x1="15" y1="6" x2="15" y2="6.01"/><line x1="9" y1="10" x2="9" y2="10.01"/><line x1="15" y1="10" x2="15" y2="10.01"/><line x1="9" y1="14" x2="9" y2="14.01"/><line x1="15" y1="14" x2="15" y2="14.01"/></svg>';
 var ICON_EMPTY = '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>';
+// Colors the name-avatar circles cycle through.
 var AVATAR_PALETTE = ['#1F6F5C', '#2B6CB0', '#E08E2B', '#7A5CC7', '#C0402E', '#0E8C8C', '#B0793C', '#4A6FA5'];
 
 /* ---------------- utils ---------------- */
+// Escapes special characters so names/phone numbers can be safely dropped into HTML.
+// (Without this, a name containing <, > etc. could break the layout or open up an
+// injection risk.)
 function escapeHtml(str) {
   return String(str == null ? '' : str).replace(/[&<>"']/g, function (c) {
     return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
   });
 }
+// Picks the letter(s) to show inside an avatar circle (first character for Korean
+// names, first two initials for others).
 function initials(name) {
   var trimmed = (name || '').trim();
   if (!trimmed) return '?';
@@ -181,23 +184,32 @@ function initials(name) {
   if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
   return trimmed.slice(0, 2).toUpperCase();
 }
+// Picks a color from the palette based on the name, so the same person always
+// gets the same avatar color.
 function colorForString(str) {
   var h = 0, s = String(str || '');
   for (var i = 0; i < s.length; i++) { h = (h * 31 + s.charCodeAt(i)) >>> 0; }
   return AVATAR_PALETTE[h % AVATAR_PALETTE.length];
 }
+// Turns a phone number into a "tel:" link so tapping it opens the phone app.
+// Returns null when there's no number.
 function telHref(phone) {
   if (!phone) return null;
   var cleaned = phone.replace(/[^0-9+]/g, '');
   return cleaned ? 'tel:' + cleaned : null;
 }
+// Turns an email address into a "mailto:" link (tapping it opens a new email draft).
 function mailHref(email) { return email ? 'mailto:' + email.trim() : null; }
+// Collects every email address inside one organization to build a
+// "email this whole organization" link.
 function groupMailHref(cat) {
   var emails = cat.contacts.map(function (c) { return c.email; }).filter(Boolean);
   if (!emails.length) return null;
   var subject = encodeURIComponent('[' + cat.name + '] 안내 메일');
   return 'mailto:' + emails.join(',') + '?subject=' + subject;
 }
+// Collects every email address across every organization for the bottom
+// "Send Email to Everyone" button.
 function allMailHref() {
   var emails = [];
   DATA.categories.forEach(function (cat) { cat.contacts.forEach(function (c) { if (c.email) emails.push(c.email); }); });
@@ -205,10 +217,19 @@ function allMailHref() {
   var subject = encodeURIComponent('[' + (DATA.appTitle || '한인회 연락망') + '] 안내 메일');
   return 'mailto:' + emails.join(',') + '?subject=' + subject;
 }
+// Look up an organization by id / look up one contact inside that organization by id.
+// Shared helpers used all over the app.
 function findCategory(id) { return DATA.categories.find(function (c) { return c.id === id; }); }
 function findContact(cat, id) { return cat ? cat.contacts.find(function (c) { return c.id === id; }) : null; }
 
-/* ---------------- CSV parsing ---------------- */
+/* ---------------- CSV parsing ----------------
+   Publishing a Google Sheet "to the web" as CSV gives us comma-separated text.
+   This section turns that raw text into the { organization, name, contact... }
+   shape the rest of the app works with. */
+// Splits raw CSV text into rows, then cells (handling commas/quotes correctly).
+// (CSV exported from Excel/Google Sheets can wrap a cell in quotes when it contains
+// a comma or line break, so a naive split on "," would corrupt those cells — this
+// walks the text character by character, tracking whether we're inside quotes.)
 function parseCSV(text) {
   var rows = [], row = [], field = '', inQuotes = false;
   for (var i = 0; i < text.length; i++) {
@@ -227,9 +248,17 @@ function parseCSV(text) {
   if (field.length || row.length) { row.push(field); rows.push(row); }
   return rows.filter(function (r) { return r.length && r.some(function (v) { return v !== ''; }); });
 }
+// Turns an organization name (including Korean text) into a safe id string
+// (e.g. "한인회" → "한인회", "OKTA!" → "OKTA").
 function slugify(str) {
   return String(str || '').trim().replace(/[^a-zA-Z0-9가-힣]+/g, '-').replace(/^-+|-+$/g, '') || 'cat';
 }
+// Converts the parsed CSV rows (a 2D array) into the app's data structure.
+// Whatever value is in the "카테고리" (organization) column becomes an organization —
+// however many distinct ones appear in the sheet (4, 10, 20...) all show up
+// automatically. The organization count is NOT hard-coded anywhere in this file.
+// A "대표" (leader) column value of Y/예/1/etc. marks that person to appear on
+// the home screen as a leader.
 function csvRowsToCategories(rows) {
   if (!rows.length) return [];
   var header = rows[0].map(function (h) { return h.trim(); });
@@ -252,10 +281,18 @@ function csvRowsToCategories(rows) {
 }
 
 /* ---------------- data loading ---------------- */
+// Key used to cache the last-loaded data in this browser's storage — so if the
+// sheet can't be reached (offline, briefly down), the app can still show the
+// last known data instead of nothing.
 var CACHE_KEY = 'gigroster-data-v1';
 function loadCache() { try { var raw = localStorage.getItem(CACHE_KEY); return raw ? JSON.parse(raw) : null; } catch (e) { return null; } }
 function saveCache(data) { try { localStorage.setItem(CACHE_KEY, JSON.stringify({ data: data, at: Date.now() })); } catch (e) { } }
 
+// Prepares the real data when the app boots (or is refreshed).
+// Order: (1) if a cache exists, render with it right away, (2) if CONFIG.sheetCsvUrl
+// is set, fetch the Google Sheet and overwrite everything with the latest content,
+// (3) if there's no sheet configured or the fetch fails, fall back to the cache or
+// to FALLBACK_DATA.
 function loadData() {
   var cached = loadCache();
   if (cached && cached.data) { DATA = cached.data; }
@@ -281,6 +318,8 @@ function loadData() {
 }
 
 /* ---------------- toast ---------------- */
+// Shows a small message near the bottom of the screen that fades away on its own
+// (e.g. "등록된 전화번호가 없어요." — "no phone number on file").
 function showToast(msg) {
   var t = document.getElementById('toast');
   if (!t) return;
@@ -301,6 +340,13 @@ function onSearchInput(v) {
 }
 
 /* ---------------- render: shell ---------------- */
+// The core full-screen redraw. Call this whenever `session` changes (opening an
+// organization, going back, etc.) — it (1) redraws the current screen (home or
+// organization) and (2) shows the contact popup on top of it if one is open.
+// (While typing in the search box, this is deliberately NOT used — onSearchInput
+// calls updateHomeBody/updateCategoryBody instead, which only refresh the results
+// list. Using render() during typing would rebuild the input and break Korean
+// text composition.)
 function render() {
   var app = document.getElementById('app');
   app.innerHTML = renderShell();
@@ -313,6 +359,9 @@ function render() {
     setTimeout(function () { if (!session.contactId) ov.innerHTML = ''; }, 260);
   }
 }
+// Creates (once) the container that holds the contact popup — the dimmed
+// backdrop plus the sheet that slides up from the bottom. Also wires up
+// "tap the backdrop to close".
 function ensureOverlayRoot() {
   var el = document.getElementById('overlay-root');
   if (!el) {
@@ -322,12 +371,19 @@ function ensureOverlayRoot() {
   }
   return el;
 }
+// Adds a thin divider under the top bar once the page is scrolled a bit
+// (applies to every screen).
 window.addEventListener('scroll', function () {
   var tb = document.getElementById('topbar');
   if (tb) { if (window.scrollY > 4) tb.classList.add('scrolled'); else tb.classList.remove('scrolled'); }
 }, { passive: true });
 
 /* ---------------- render: home (category grid) ---------------- */
+// Renders the home screen's body (everything below the search box).
+// - No search query: each organization's name is shown large, followed by just
+//   its "leader" contacts (regular members are only shown inside that organization's page).
+// - With a search query: matching people across every organization, grouped by
+//   organization.
 function renderHomeBody() {
   var q = session.query.trim().toLowerCase();
   if (!DATA.categories.length) {
@@ -365,10 +421,15 @@ function renderHomeBody() {
     );
   }).join('');
 }
+// Called on every keystroke in the search box — swaps out only the results
+// list (#directory-body) so the input element itself is never touched and
+// Korean text composition never breaks.
 function updateHomeBody() {
   var el = document.getElementById('directory-body');
   if (el) el.innerHTML = renderHomeBody();
 }
+// Renders the whole home screen: top bar, search box, body, and the
+// "Send Email to Everyone" bar pinned to the bottom.
 function renderHomeShell() {
   var allMail = allMailHref();
   return (
@@ -381,11 +442,13 @@ function renderHomeShell() {
       '<input type="text" id="search-input" placeholder="이름, 단체, 직함 검색" value="' + escapeHtml(session.query) + '" oninput="onSearchInput(this.value)"></div>' +
     '</div>' +
     '<main id="directory-body" style="padding-bottom:0;">' + renderHomeBody() + '</main>' +
-    '<div class="fab-bar"><button class="fab-mail" ' + (allMail ? '' : 'disabled') + ' onclick="' + (allMail ? 'sendMailToEveryone()' : '') + '">' + ICON_MAIL + ' 전체 메일 발송' + (allMail ? '' : ' (등록된 이메일 없음)') + '</button></div>'
+    '<div class="fab-bar"><button class="fab-mail" ' + (allMail ? '' : 'disabled') + ' onclick="' + (allMail ? 'sendMailToEveryone()' : '') + '">' + ICON_MAIL + ' 전체 메일 발송</button></div>'
   );
 }
 
 /* ---------------- render: category detail (drill-in) ---------------- */
+// The body of the screen you land on after tapping an organization — shows
+// that organization's full roster (everyone, leaders included).
 function renderCategoryBody(cat) {
   var q = session.query.trim().toLowerCase();
   var contacts = q ? cat.contacts.filter(function (c) {
@@ -399,11 +462,15 @@ function renderCategoryBody(cat) {
   }
   return contacts.map(function (c) { return renderContactRowDetail(c, cat.id); }).join('');
 }
+// Called on every keystroke in the organization screen's search box — same idea
+// as updateHomeBody: only the list refreshes, the input stays untouched.
 function updateCategoryBody() {
   var cat = findCategory(session.categoryId);
   var el = document.getElementById('directory-body');
   if (el && cat) el.innerHTML = renderCategoryBody(cat);
 }
+// Renders the whole organization screen: back button, organization name,
+// "email this organization" button, search box, and the roster.
 function renderCategoryShell() {
   var cat = findCategory(session.categoryId);
   if (!cat) { session.view = 'home'; session.categoryId = null; return renderHomeShell(); }
@@ -423,9 +490,15 @@ function renderCategoryShell() {
 }
 
 /* ---------------- render: shell dispatch ---------------- */
+// Decides whether to render the home screen or the organization screen based
+// on session.view.
 function renderShell() {
   return session.view === 'category' ? renderCategoryShell() : renderHomeShell();
 }
+// Builds the HTML for one contact list row (avatar + name + role badge +
+// phone/email). Shared by both the home screen (leaders/search results) and
+// the organization screen (full roster). Tapping a row calls openContact(),
+// which opens that person's detail popup.
 function renderContactRowDetail(c, categoryId) {
   var tel = telHref(c.phone), mail = mailHref(c.email);
   var meta = (tel ? '<span>' + ICON_CALL + escapeHtml(c.phone) + '</span>' : '') + (mail ? '<span>' + ICON_MAIL + escapeHtml(c.email) + '</span>' : '');
@@ -438,43 +511,61 @@ function renderContactRowDetail(c, categoryId) {
       '</div><span class="chev">' + ICON_CHEV + '</span></div>'
   );
 }
+// The bottom green "Send Email to Everyone" button — opens the mail app with
+// every organization's every email address filled in as the recipient.
 function sendMailToEveryone() {
   var href = allMailHref();
   if (href) location.href = href;
 }
+// Tapping an organization on the home screen — navigates to that
+// organization's full roster screen.
 function openCategory(catId) {
   session.view = 'category'; session.categoryId = catId; session.query = ''; session.contactId = null;
   render();
 }
+// Tapping the back button on the organization screen — returns to the home screen.
 function backToHome() {
   session.view = 'home'; session.categoryId = null; session.query = ''; session.contactId = null;
   render();
 }
 
-/* ---------------- actions ---------------- */
+/* ---------------- actions ----------------
+   What actually happens when the phone/mail icon buttons are tapped. */
+// Tapping the phone icon — opens the phone app if a number is on file,
+// otherwise shows a toast.
 function callContact(categoryId, contactId) {
   var cat = findCategory(categoryId), c = cat && findContact(cat, contactId), href = c && telHref(c.phone);
   if (href) location.href = href; else showToast('등록된 전화번호가 없어요.');
 }
+// Tapping the mail icon — opens the mail app if an email is on file,
+// otherwise shows a toast.
 function emailContact(categoryId, contactId) {
   var cat = findCategory(categoryId), c = cat && findContact(cat, contactId), href = c && mailHref(c.email);
   if (href) location.href = href; else showToast('등록된 이메일이 없어요.');
 }
+// Tapping the mail icon at the top of an organization screen — emails
+// everyone in that organization.
 function sendGroupMail(categoryId) {
   var cat = findCategory(categoryId), href = cat && groupMailHref(cat);
   if (href) location.href = href;
 }
 
 /* ---------------- contact detail (popup sheet over the current screen) ---------------- */
+// Tapping a contact row — opens the detail popup on top of whichever screen
+// (home or organization) you were on.
 function openContact(categoryId, contactId) {
   session.categoryId = categoryId;
   session.contactId = contactId;
   render();
 }
+// Tapping the popup's X button or the dimmed backdrop — closes just the
+// popup, leaving the screen underneath exactly as it was.
 function closeContact() {
   session.contactId = null;
   render();
 }
+// Builds the popup's content: avatar, name + role, organization name, and
+// the phone/email rows with their call/mail action buttons.
 function renderContactSheetContent() {
   var cat = findCategory(session.categoryId), c = cat && findContact(cat, session.contactId);
   if (!cat || !c) {
@@ -495,6 +586,8 @@ function renderContactSheetContent() {
 }
 
 /* ---------------- boot ---------------- */
+// Runs once as soon as the page loads — fetches the data and renders the
+// first screen.
 loadData();
 </script>
 </body>
