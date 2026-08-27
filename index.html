@@ -115,6 +115,35 @@
   .lock-btn:active{transform:scale(0.98);}
   .lock-error{font-size:12.5px; color:var(--danger); margin-top:12px; min-height:16px;}
   .toast.show{opacity:1; transform:translateX(-50%) translateY(-4px);}
+
+  /* -------- 대분류/중분류 section headings on the home screen -------- */
+  .major-head{margin:26px 2px 4px;}
+  .major-head:first-child{margin-top:2px;}
+  .major-title{display:inline-block; font-size:12.5px; font-weight:800; color:var(--primary-dark); background:var(--primary-soft); padding:5px 12px; border-radius:999px; letter-spacing:.01em;}
+  .mid-head{margin:18px 6px 8px 4px;}
+  .mid-title{font-size:13.5px; font-weight:700; color:var(--ink-soft); border-left:3px solid var(--primary-soft); padding-left:10px;}
+
+  /* -------- org-picker sidebar (pale yellow, kept distinct from the app's green) -------- */
+  .side-overlay{position:fixed; inset:0; background:rgba(20,24,22,0.45); z-index:60; opacity:0; pointer-events:none; transition:opacity .2s ease;}
+  .side-overlay.open{opacity:1; pointer-events:auto;}
+  .side-panel{position:fixed; top:0; left:0; bottom:0; width:86%; max-width:320px; background:#FFFBE6; box-shadow:var(--shadow); transform:translateX(-100%); transition:transform .24s ease; display:flex; flex-direction:column; padding:18px 0 calc(14px + env(safe-area-inset-bottom));}
+  .side-overlay.open .side-panel{transform:translateX(0);}
+  .side-head{display:flex; align-items:center; justify-content:space-between; padding:2px 18px 14px; border-bottom:1px solid #F5E9A8; flex:none;}
+  .side-title{font-size:17px; font-weight:800; font-family:'Gothic A1','Noto Sans KR',sans-serif; color:#6B5A12;}
+  .side-toolbar{display:flex; gap:8px; padding:12px 18px; flex:none;}
+  .side-link{border:1px solid #F0DE85; background:#FFF6C9; color:#8A7212; font-size:12.5px; font-weight:700; padding:6px 12px; border-radius:999px; cursor:pointer;}
+  .side-list{flex:1; overflow-y:auto; padding:0 18px 8px;}
+  .side-major-title{font-size:12px; font-weight:800; color:#8A7212; background:#FFF3B0; display:inline-block; padding:4px 10px; border-radius:999px; margin:14px 0 6px;}
+  .side-mid-title{font-size:12.5px; font-weight:700; color:#7A6A28; margin:10px 0 4px 4px;}
+  .side-org-row{display:flex; align-items:center; gap:10px; padding:9px 4px; border-bottom:1px solid #F7EFC4; cursor:pointer;}
+  .side-org-row input{width:18px; height:18px; accent-color:#C9A400; flex:none;}
+  .side-org-name{flex:1; font-size:14.5px; font-weight:600; color:#3E3510;}
+  .side-org-cnt{font-size:12px; color:#9C8A3E; flex:none;}
+  .side-footer{padding:14px 18px 4px; border-top:1px solid #F5E9A8; flex:none;}
+  .side-count{font-size:12.5px; color:#7A6A28; margin-bottom:8px; text-align:center;}
+  .side-mail-btn{width:100%; display:flex; align-items:center; justify-content:center; gap:8px; background:#F5C400; color:#3E3510; border:none; border-radius:999px; padding:13px 16px; font-size:14.5px; font-weight:800; cursor:pointer;}
+  .side-mail-btn[disabled]{opacity:.5; pointer-events:none;}
+  .side-mail-btn:active{transform:scale(0.98);}
 </style>
 </head>
 <body>
@@ -133,7 +162,10 @@
    TAB_NAME is the sheet tab's name at the bottom — default is "시트1")
    ===================================================================== */
 var CONFIG = {
-  sheetCsvUrl: "https://docs.google.com/spreadsheets/d/1Y0wPSUBUH9F2iL556OWqFptQOIT5eDMdskvwKOuAnx4/gviz/tq?tqx=out:csv&sheet=시트1",
+  sheetCsvUrl: "https://docs.google.com/spreadsheets/d/1SYbT1xtFEurGKXkc3nswdHGtTSZX09YVHqpX6aV2HMU/gviz/tq?tqx=out:csv&sheet=Sheet1",
+  // Password required to view the directory. Replace 여기 (between the quotes)
+  // with whatever password you want people to enter — keep the quotes.
+  // Example: password: "hansarang2026"
   password: "123456"
 };
 
@@ -162,7 +194,10 @@ var DATA = FALLBACK_DATA;
 // unlocked: whether the password screen has been passed. Starts false and gets
 // flipped to true either immediately (if this device already unlocked it before,
 // see LOCK_KEY below) or once the visitor types the right password.
-var session = { view: 'home', query: '', categoryId: null, contactId: null, unlocked: false };
+// sidebarOpen: whether the left "pick organizations" panel is open.
+// selectedOrgIds: map of organization id -> true for the org-picker sidebar's
+// checkboxes (which orgs are checked for the "email selected organizations" button).
+var session = { view: 'home', query: '', categoryId: null, contactId: null, unlocked: false, sidebarOpen: false, selectedOrgIds: {} };
 
 /* ---------------- password gate ---------------- */
 // If CONFIG.password is left blank (empty string), the gate is skipped entirely —
@@ -294,30 +329,42 @@ function slugify(str) {
   return String(str || '').trim().replace(/[^a-zA-Z0-9가-힣]+/g, '-').replace(/^-+|-+$/g, '') || 'cat';
 }
 // Converts the parsed CSV rows (a 2D array) into the app's data structure.
-// Whatever value is in the "카테고리" (organization) column becomes an organization —
-// however many distinct ones appear in the sheet (4, 10, 20...) all show up
-// automatically. The organization count is NOT hard-coded anywhere in this file.
-// A "대표" (leader) column value of Y/예/1/etc. marks that person to appear on
-// the home screen as a leader.
+// Whatever value is in the "카테고리" (organization) column becomes an organization
+// (this is the 소분류 level) — however many distinct ones appear in the sheet
+// (4, 10, 20...) all show up automatically. The organization count is NOT
+// hard-coded anywhere in this file. A "대표" (leader) column value of Y/예/1/etc.
+// marks that person to appear on the home screen as a leader.
+// Two more columns tag each organization with where it sits in the bigger
+// picture: "대분류" (major category, e.g. 주요 단체 / 일반 단체) and a mid-level
+// column read as "중분류" if that header exists, otherwise falling back to
+// "소분류" (the name currently used in the sheet for that same column) — either
+// way it becomes cat.mid. Both are optional per row; an organization with no
+// 중분류 value is simply grouped directly under its 대분류 later on.
 function csvRowsToCategories(rows) {
   if (!rows.length) return [];
   var header = rows[0].map(function (h) { return h.trim(); });
-  var idx = { cat: header.indexOf('카테고리'), name: header.indexOf('이름'), role: header.indexOf('역할'), phone: header.indexOf('전화번호'), email: header.indexOf('이메일'), lead: header.indexOf('대표') };
+  var midIdx = header.indexOf('중분류');
+  if (midIdx === -1) midIdx = header.indexOf('소분류');
+  var idx = { cat: header.indexOf('카테고리'), name: header.indexOf('이름'), role: header.indexOf('역할'), phone: header.indexOf('전화번호'), email: header.indexOf('이메일'), lead: header.indexOf('대표'), major: header.indexOf('대분류'), mid: midIdx };
   if (idx.cat === -1 || idx.name === -1) return [];
   var LEAD_TRUE = { 'y': 1, 'yes': 1, 'true': 1, '1': 1, 'o': 1, '예': 1, '대표': 1, '대장': 1 };
-  var catMap = {}, order = [], counter = 0;
+  var catMap = {}, catMeta = {}, order = [], counter = 0;
   for (var r = 1; r < rows.length; r++) {
     var row = rows[r];
     var catName = (row[idx.cat] || '').trim();
     if (!catName) continue;
-    if (!catMap[catName]) { catMap[catName] = []; order.push(catName); }
+    if (!catMap[catName]) { catMap[catName] = []; order.push(catName); catMeta[catName] = { major: '', mid: '' }; }
+    var majorVal = idx.major > -1 ? (row[idx.major] || '').trim() : '';
+    var midVal = idx.mid > -1 ? (row[idx.mid] || '').trim() : '';
+    if (majorVal) catMeta[catName].major = majorVal;
+    if (midVal) catMeta[catName].mid = midVal;
     var name = (row[idx.name] || '').trim();
     if (!name) continue;
     counter++;
     var leadRaw = idx.lead > -1 ? (row[idx.lead] || '').trim().toLowerCase() : '';
     catMap[catName].push({ id: 'ct-' + counter, name: name, role: (idx.role > -1 ? (row[idx.role] || '').trim() : ''), phone: (idx.phone > -1 ? (row[idx.phone] || '').trim() : ''), email: (idx.email > -1 ? (row[idx.email] || '').trim() : ''), lead: !!LEAD_TRUE[leadRaw] });
   }
-  return order.map(function (catName) { return { id: 'cat-' + slugify(catName), name: catName, contacts: catMap[catName] }; });
+  return order.map(function (catName) { return { id: 'cat-' + slugify(catName), name: catName, contacts: catMap[catName], major: catMeta[catName].major, mid: catMeta[catName].mid }; });
 }
 
 /* ---------------- data loading ---------------- */
@@ -399,6 +446,14 @@ function render() {
     ov.classList.remove('open');
     setTimeout(function () { if (!session.contactId) ov.innerHTML = ''; }, 260);
   }
+  var sd = ensureSideRoot();
+  if (session.sidebarOpen) {
+    sd.innerHTML = '<div class="side-panel">' + renderSidebarContent() + '</div>';
+    requestAnimationFrame(function () { sd.classList.add('open'); });
+  } else {
+    sd.classList.remove('open');
+    setTimeout(function () { if (!session.sidebarOpen) sd.innerHTML = ''; }, 260);
+  }
 }
 // Creates (once) the container that holds the contact popup — the dimmed
 // backdrop plus the sheet that slides up from the bottom. Also wires up
@@ -412,6 +467,17 @@ function ensureOverlayRoot() {
   }
   return el;
 }
+// Creates (once) the container for the left-side "pick organizations" panel —
+// the dimmed backdrop plus the sliding panel itself. Tapping the backdrop closes it.
+function ensureSideRoot() {
+  var el = document.getElementById('side-root');
+  if (!el) {
+    el = document.createElement('div'); el.id = 'side-root'; el.className = 'side-overlay';
+    el.addEventListener('click', function (e) { if (e.target === el) closeSidebar(); });
+    document.body.appendChild(el);
+  }
+  return el;
+}
 // Adds a thin divider under the top bar once the page is scrolled a bit
 // (applies to every screen).
 window.addEventListener('scroll', function () {
@@ -419,10 +485,66 @@ window.addEventListener('scroll', function () {
   if (tb) { if (window.scrollY > 4) tb.classList.add('scrolled'); else tb.classList.remove('scrolled'); }
 }, { passive: true });
 
+/* ---------------- grouping (대분류 / 중분류 / 소분류) ---------------- */
+// Groups the flat list of organizations (each tagged with cat.major / cat.mid,
+// read from the sheet's 대분류 / 중분류 columns) into a 대분류 → 중분류 → 소분류(org)
+// tree. Used by both the home screen and the org-picker sidebar. An org with no
+// 중분류 value is placed directly under its 대분류 with no subheading, since the
+// sheet leaves that column blank for some organizations.
+function groupCategoriesByMajor(cats) {
+  var majorOrder = [], majorMap = {};
+  cats.forEach(function (cat) {
+    var maj = cat.major || '기타';
+    if (!majorMap[maj]) { majorMap[maj] = { ungrouped: [], midOrder: [], midMap: {} }; majorOrder.push(maj); }
+    var g = majorMap[maj];
+    var mid = cat.mid;
+    if (!mid) { g.ungrouped.push(cat); }
+    else {
+      if (!g.midMap[mid]) { g.midMap[mid] = []; g.midOrder.push(mid); }
+      g.midMap[mid].push(cat);
+    }
+  });
+  return majorOrder.map(function (maj) {
+    var g = majorMap[maj];
+    return { name: maj, ungrouped: g.ungrouped, midGroups: g.midOrder.map(function (mid) { return { name: mid, orgs: g.midMap[mid] }; }) };
+  });
+}
+
 /* ---------------- render: home (category grid) ---------------- */
+// Renders one organization's block: its name/count header, then either its
+// "leader" contacts or a hint to open the full roster. Shared by the flat
+// listing and the grouped (대분류/중분류) listing below.
+function renderOrgBlock(cat) {
+  var leaders = cat.contacts.filter(function (c) { return c.lead; });
+  return (
+    '<div class="org-block">' +
+      '<button class="org-head" onclick="openCategory(\'' + cat.id + '\')">' +
+        '<span><span class="org-name">' + escapeHtml(cat.name) + '</span><span class="org-cnt">' + cat.contacts.length + '명</span></span>' +
+        '<span class="chev">' + ICON_CHEV + '</span>' +
+      '</button>' +
+      (leaders.length ? leaders.map(function (c) { return renderContactRowDetail(c, cat.id); }).join('')
+        : '<p class="org-empty-hint" onclick="openCategory(\'' + cat.id + '\')">등록된 대표자가 없어요. 눌러서 전체 명단 보기</p>') +
+    '</div>'
+  );
+}
+// Renders the home screen grouped by 대분류 (major section headings), and within
+// each, by 중분류 (sub-headings) when that org has one — otherwise the org is
+// listed directly under its 대분류.
+function renderHomeGroups() {
+  var majors = groupCategoriesByMajor(DATA.categories);
+  return majors.map(function (major) {
+    var html = '<div class="major-head"><span class="major-title">' + escapeHtml(major.name) + '</span></div>';
+    html += major.ungrouped.map(renderOrgBlock).join('');
+    html += major.midGroups.map(function (mg) {
+      return '<div class="mid-head"><span class="mid-title">' + escapeHtml(mg.name) + '</span></div>' + mg.orgs.map(renderOrgBlock).join('');
+    }).join('');
+    return html;
+  }).join('');
+}
 // Renders the home screen's body (everything below the search box).
-// - No search query: each organization's name is shown large, followed by just
-//   its "leader" contacts (regular members are only shown inside that organization's page).
+// - No search query: grouped by 대분류/중분류 when the sheet has that data,
+//   otherwise a flat list of organizations — each showing just its "leader"
+//   contacts (regular members are only shown inside that organization's page).
 // - With a search query: matching people across every organization, grouped by
 //   organization.
 function renderHomeBody() {
@@ -431,19 +553,8 @@ function renderHomeBody() {
     return '<div class="empty-state">' + ICON_EMPTY + '<p>아직 등록된 카테고리가 없어요.</p></div>';
   }
   if (!q) {
-    return DATA.categories.map(function (cat) {
-      var leaders = cat.contacts.filter(function (c) { return c.lead; });
-      return (
-        '<div class="org-block">' +
-          '<button class="org-head" onclick="openCategory(\'' + cat.id + '\')">' +
-            '<span><span class="org-name">' + escapeHtml(cat.name) + '</span><span class="org-cnt">' + cat.contacts.length + '명</span></span>' +
-            '<span class="chev">' + ICON_CHEV + '</span>' +
-          '</button>' +
-          (leaders.length ? leaders.map(function (c) { return renderContactRowDetail(c, cat.id); }).join('')
-            : '<p class="org-empty-hint" onclick="openCategory(\'' + cat.id + '\')">등록된 대표자가 없어요. 눌러서 전체 명단 보기</p>') +
-        '</div>'
-      );
-    }).join('');
+    var hasMajor = DATA.categories.some(function (c) { return c.major; });
+    return hasMajor ? renderHomeGroups() : DATA.categories.map(renderOrgBlock).join('');
   }
   /* searching from the home screen: show matches grouped by category, across everything */
   var sections = DATA.categories.map(function (cat) {
@@ -475,7 +586,8 @@ function renderHomeShell() {
   var allMail = allMailHref();
   return (
     '<div class="topbar" id="topbar">' +
-      '<div class="brand-row"><span></span>' +
+      '<div class="brand-row">' +
+        '<button class="icon-btn" onclick="openSidebar()" aria-label="단체 선택 메뉴">' + ICON_MENU + '</button>' +
         '<h1 class="brand">' + escapeHtml(DATA.appTitle || '한인회 연락망') + '</h1>' +
         '<span></span>' +
       '</div>' +
@@ -588,6 +700,87 @@ function openCategory(catId) {
 function backToHome() {
   session.view = 'home'; session.categoryId = null; session.query = ''; session.contactId = null;
   render();
+}
+
+/* ---------------- org-picker sidebar ---------------- */
+// Left-side panel: lets someone browse every organization grouped by
+// 대분류/중분류, check off just the ones they want, and email only those
+// organizations at once (separate from "email this one org" and "email
+// everyone"). Opened via the menu icon in the home screen's top bar.
+function openSidebar() { session.sidebarOpen = true; render(); }
+function closeSidebar() { session.sidebarOpen = false; render(); }
+// Builds the sidebar's full content: header, select-all/none shortcuts, the
+// grouped checkbox list, and the "email selected organizations" footer button.
+function renderSidebarContent() {
+  var majors = groupCategoriesByMajor(DATA.categories);
+  var selCount = Object.keys(session.selectedOrgIds).length;
+  var href = selectedOrgsMailHref();
+  var body = !DATA.categories.length
+    ? '<p class="hint">등록된 단체가 없어요.</p>'
+    : majors.map(function (major) {
+        var html = '<div class="side-major-title">' + escapeHtml(major.name) + '</div>';
+        html += major.ungrouped.map(renderSideOrgRow).join('');
+        html += major.midGroups.map(function (mg) {
+          return '<div class="side-mid-title">' + escapeHtml(mg.name) + '</div>' + mg.orgs.map(renderSideOrgRow).join('');
+        }).join('');
+        return html;
+      }).join('');
+  return (
+    '<div class="side-head"><span class="side-title">단체 선택</span>' +
+      '<button class="close-x" onclick="closeSidebar()" aria-label="닫기">' + ICON_CLOSE + '</button>' +
+    '</div>' +
+    '<div class="side-toolbar">' +
+      '<button class="side-link" onclick="selectAllOrgs(true)">전체 선택</button>' +
+      '<button class="side-link" onclick="selectAllOrgs(false)">전체 해제</button>' +
+    '</div>' +
+    '<div class="side-list">' + body + '</div>' +
+    '<div class="side-footer">' +
+      '<div class="side-count">' + selCount + '개 단체 선택됨</div>' +
+      '<button class="side-mail-btn" ' + (href ? '' : 'disabled') + ' onclick="' + (href ? 'sendMailToSelected()' : '') + '">' + ICON_MAIL + ' 선택 단체에 메일 보내기</button>' +
+    '</div>'
+  );
+}
+// One checkbox row inside the sidebar list, for a single organization (소분류).
+function renderSideOrgRow(cat) {
+  var checked = !!session.selectedOrgIds[cat.id];
+  return (
+    '<label class="side-org-row">' +
+      '<input type="checkbox" ' + (checked ? 'checked' : '') + ' onchange="toggleOrgSelect(\'' + cat.id + '\', this.checked)">' +
+      '<span class="side-org-name">' + escapeHtml(cat.name) + '</span>' +
+      '<span class="side-org-cnt">' + cat.contacts.length + '명</span>' +
+    '</label>'
+  );
+}
+// Redraws just the sidebar panel's content (checkbox list + footer) after a
+// selection changes, without touching the screen behind it.
+function updateSidebarBody() {
+  var el = document.getElementById('side-root');
+  var panel = el && el.querySelector('.side-panel');
+  if (panel) panel.innerHTML = renderSidebarContent();
+}
+function toggleOrgSelect(id, checked) {
+  if (checked) session.selectedOrgIds[id] = true; else delete session.selectedOrgIds[id];
+  updateSidebarBody();
+}
+function selectAllOrgs(on) {
+  session.selectedOrgIds = {};
+  if (on) DATA.categories.forEach(function (c) { session.selectedOrgIds[c.id] = true; });
+  updateSidebarBody();
+}
+// Collects every email address belonging to the currently-checked organizations.
+function selectedOrgsMailHref() {
+  var emails = [];
+  DATA.categories.forEach(function (cat) {
+    if (!session.selectedOrgIds[cat.id]) return;
+    cat.contacts.forEach(function (c) { if (c.email) emails.push(c.email); });
+  });
+  if (!emails.length) return null;
+  var subject = encodeURIComponent('[' + (DATA.appTitle || '한인회 연락망') + '] 안내 메일');
+  return 'mailto:' + emails.join(',') + '?subject=' + subject;
+}
+function sendMailToSelected() {
+  var href = selectedOrgsMailHref();
+  if (href) location.href = href; else showToast('선택한 단체에 등록된 이메일이 없어요.');
 }
 
 /* ---------------- actions ----------------
