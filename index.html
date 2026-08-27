@@ -139,8 +139,9 @@
   .side-toolbar{display:flex; gap:8px; padding:12px 18px; flex:none;}
   .side-link{border:1px solid #F0DE85; background:#FFF6C9; color:#8A7212; font-size:12.5px; font-weight:700; padding:6px 12px; border-radius:999px; cursor:pointer;}
   .side-list{flex:1; overflow-y:auto; padding:0 18px 8px;}
-  .side-major-title{font-size:12px; font-weight:800; color:#8A7212; background:#FFF3B0; display:inline-block; padding:4px 10px; border-radius:999px; margin:14px 0 6px;}
-  .side-mid-title{font-size:12.5px; font-weight:700; color:#7A6A28; margin:10px 0 4px 4px;}
+  .side-major-title{display:flex; align-items:center; gap:8px; width:fit-content; font-size:12px; font-weight:800; color:#8A7212; background:#FFF3B0; padding:4px 10px 4px 8px; border-radius:999px; margin:14px 0 6px; cursor:pointer;}
+  .side-mid-title{display:flex; align-items:center; gap:8px; width:fit-content; font-size:12.5px; font-weight:700; color:#7A6A28; margin:10px 0 4px 4px; cursor:pointer;}
+  .side-major-title input, .side-mid-title input{width:16px; height:16px; accent-color:#C9A400; flex:none;}
   .side-org-row{display:flex; align-items:center; gap:10px; padding:9px 4px; border-bottom:1px solid #F7EFC4; cursor:pointer;}
   .side-org-row input{width:18px; height:18px; accent-color:#C9A400; flex:none;}
   .side-org-name{flex:1; font-size:14.5px; font-weight:600; color:#3E3510;}
@@ -382,6 +383,18 @@ function loadCache() { try { var raw = localStorage.getItem(CACHE_KEY); return r
 function saveCache(data) { try { localStorage.setItem(CACHE_KEY, JSON.stringify({ data: data, at: Date.now() })); } catch (e) { } }
 
 // Prepares the real data when the app boots (or is refreshed).
+// Sorts organizations in Korean (가나다) order, except one pinned organization
+// (오클랜드 한인회, the Korean Society itself) which always stays first regardless
+// of where it would otherwise fall alphabetically. Applies within whatever
+// grouping the org already belongs to, since it just reorders the flat list
+// that groupCategoriesByMajor() later buckets by 대분류/중분류.
+function sortCategoriesPinFirst(cats, pinnedName) {
+  var pinned = cats.filter(function (c) { return c.name === pinnedName; });
+  var rest = cats.filter(function (c) { return c.name !== pinnedName; });
+  rest.sort(function (a, b) { return a.name.localeCompare(b.name, 'ko'); });
+  return pinned.concat(rest);
+}
+
 // Order: (1) if a cache exists, render with it right away, (2) if CONFIG.sheetCsvUrl
 // is set, fetch the Google Sheet and overwrite everything with the latest content,
 // (3) if there's no sheet configured or the fetch fails, fall back to the cache or
@@ -401,6 +414,7 @@ function loadData() {
   }).then(function (text) {
     var categories = csvRowsToCategories(parseCSV(text));
     if (!categories.length) throw new Error('빈 데이터');
+    categories = sortCategoriesPinFirst(categories, '오클랜드 한인회');
     DATA = { appTitle: FALLBACK_DATA.appTitle, categories: categories };
     saveCache(DATA);
     render();
@@ -731,10 +745,13 @@ function renderSidebarContent() {
   var body = !DATA.categories.length
     ? '<p class="hint">등록된 단체가 없어요.</p>'
     : majors.map(function (major) {
-        var html = '<div class="side-major-title">' + escapeHtml(major.name) + '</div>';
+        var midIdLists = major.midGroups.map(function (mg) { return mg.orgs.map(function (c) { return c.id; }); });
+        var allMidIds = midIdLists.reduce(function (a, b) { return a.concat(b); }, []);
+        var allIds = major.ungrouped.map(function (c) { return c.id; }).concat(allMidIds);
+        var html = renderGroupCheckbox('side-major-title', major.name, allIds);
         html += major.ungrouped.map(renderSideOrgRow).join('');
-        html += major.midGroups.map(function (mg) {
-          return '<div class="side-mid-title">' + escapeHtml(mg.name) + '</div>' + mg.orgs.map(renderSideOrgRow).join('');
+        html += major.midGroups.map(function (mg, i) {
+          return renderGroupCheckbox('side-mid-title', mg.name, midIdLists[i]) + mg.orgs.map(renderSideOrgRow).join('');
         }).join('');
         return html;
       }).join('');
@@ -749,8 +766,20 @@ function renderSidebarContent() {
     '<div class="side-list">' + body + '</div>' +
     '<div class="side-footer">' +
       '<div class="side-count">' + selCount + '개 단체 선택됨</div>' +
+      '<div class="hint" style="text-align:center; margin:0 0 8px;">각 단체의 대표자에게만 메일이 발송돼요</div>' +
       '<button class="side-mail-btn" ' + (href ? '' : 'disabled') + ' onclick="' + (href ? 'sendMailToSelected()' : '') + '">' + ICON_MAIL + ' 선택 단체에 메일 보내기</button>' +
     '</div>'
+  );
+}
+// A checkbox + label pair placed in front of a 대분류/중분류 heading — checking
+// it selects (or clears) every organization id listed in `ids` at once.
+function renderGroupCheckbox(cls, label, ids) {
+  var checked = ids.length > 0 && ids.every(function (id) { return !!session.selectedOrgIds[id]; });
+  return (
+    '<label class="' + cls + '">' +
+      '<input type="checkbox" data-ids="' + ids.join(',') + '" ' + (checked ? 'checked' : '') + ' onchange="toggleGroupSelect(this)">' +
+      escapeHtml(label) +
+    '</label>'
   );
 }
 // One checkbox row inside the sidebar list, for a single organization (소분류).
@@ -765,14 +794,32 @@ function renderSideOrgRow(cat) {
   );
 }
 // Redraws just the sidebar panel's content (checkbox list + footer) after a
-// selection changes, without touching the screen behind it.
+// selection changes, without touching the screen behind it. Keeps the list's
+// scroll position instead of resetting to the top — replacing .side-list's
+// innerHTML creates a brand-new scrollable element, which would otherwise
+// snap it back to scrollTop 0 every time a checkbox down the list is ticked.
 function updateSidebarBody() {
   var el = document.getElementById('side-root');
   var panel = el && el.querySelector('.side-panel');
-  if (panel) panel.innerHTML = renderSidebarContent();
+  if (!panel) return;
+  var oldList = panel.querySelector('.side-list');
+  var scrollTop = oldList ? oldList.scrollTop : 0;
+  panel.innerHTML = renderSidebarContent();
+  var newList = panel.querySelector('.side-list');
+  if (newList) newList.scrollTop = scrollTop;
 }
 function toggleOrgSelect(id, checked) {
   if (checked) session.selectedOrgIds[id] = true; else delete session.selectedOrgIds[id];
+  updateSidebarBody();
+}
+// Checking the checkbox in front of a 대분류/중분류 heading selects (or clears)
+// every organization under it at once. `checkbox` is the checkbox element
+// itself so we can read back the org ids it was rendered with.
+function toggleGroupSelect(checkbox) {
+  var ids = (checkbox.dataset.ids || '').split(',').filter(Boolean);
+  ids.forEach(function (id) {
+    if (checkbox.checked) session.selectedOrgIds[id] = true; else delete session.selectedOrgIds[id];
+  });
   updateSidebarBody();
 }
 function selectAllOrgs(on) {
@@ -780,12 +827,15 @@ function selectAllOrgs(on) {
   if (on) DATA.categories.forEach(function (c) { session.selectedOrgIds[c.id] = true; });
   updateSidebarBody();
 }
-// Collects every email address belonging to the currently-checked organizations.
+// Collects the leader's (대표) email for each currently-checked organization —
+// not every member's — so a group email through the sidebar reaches just the
+// person representing each selected organization (e.g. checking 노인회 only
+// emails its 회장).
 function selectedOrgsMailHref() {
   var emails = [];
   DATA.categories.forEach(function (cat) {
     if (!session.selectedOrgIds[cat.id]) return;
-    cat.contacts.forEach(function (c) { if (c.email) emails.push(c.email); });
+    cat.contacts.forEach(function (c) { if (c.lead && c.email) emails.push(c.email); });
   });
   if (!emails.length) return null;
   var subject = encodeURIComponent('[' + (DATA.appTitle || '한인회 연락망') + '] 안내 메일');
@@ -793,7 +843,7 @@ function selectedOrgsMailHref() {
 }
 function sendMailToSelected() {
   var href = selectedOrgsMailHref();
-  if (href) location.href = href; else showToast('선택한 단체에 등록된 이메일이 없어요.');
+  if (href) location.href = href; else showToast('선택한 단체에 등록된 대표자 이메일이 없어요.');
 }
 
 /* ---------------- actions ----------------
