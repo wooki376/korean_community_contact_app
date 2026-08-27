@@ -117,11 +117,17 @@
   .toast.show{opacity:1; transform:translateX(-50%) translateY(-4px);}
 
   /* -------- 대분류/중분류 section headings on the home screen -------- */
-  .major-head{margin:26px 2px 4px;}
-  .major-head:first-child{margin-top:2px;}
-  .major-title{display:inline-block; font-size:12.5px; font-weight:800; color:var(--primary-dark); background:var(--primary-soft); padding:5px 12px; border-radius:999px; letter-spacing:.01em;}
-  .mid-head{margin:18px 6px 8px 4px;}
-  .mid-title{font-size:13.5px; font-weight:700; color:var(--ink-soft); border-left:3px solid var(--primary-soft); padding-left:10px;}
+  /* 대분류: a bold, full-width bar so it reads as the top-level heading at a glance. */
+  .major-section{margin:28px 0 10px;}
+  .major-section:first-child{margin-top:2px;}
+  .major-title{display:block; width:100%; box-sizing:border-box; font-size:15px; font-weight:800; font-family:'Gothic A1','Noto Sans KR',sans-serif; color:#fff; background:var(--primary); padding:12px 16px; border-radius:var(--radius-sm) var(--radius-sm) 0 0; letter-spacing:.01em;}
+  /* Everything belonging to that 대분류 sits inside a tinted "card" right under
+     the bar, so 중분류 and its organizations visually read as nested inside it. */
+  .major-body{background:var(--surface-2); border:1px solid var(--border); border-top:none; border-radius:0 0 var(--radius-md) var(--radius-md); padding:16px 14px 6px;}
+  .mid-head{margin:6px 2px 10px;}
+  .mid-head:first-child{margin-top:0;}
+  .mid-title{display:inline-block; font-size:12px; font-weight:700; color:var(--primary-dark); background:var(--primary-soft); padding:4px 11px; border-radius:999px;}
+  .mid-body{padding-left:10px; border-left:2px solid var(--border); margin-bottom:8px;}
 
   /* -------- org-picker sidebar (pale yellow, kept distinct from the app's green) -------- */
   .side-overlay{position:fixed; inset:0; background:rgba(20,24,22,0.45); z-index:60; opacity:0; pointer-events:none; transition:opacity .2s ease;}
@@ -533,12 +539,19 @@ function renderOrgBlock(cat) {
 function renderHomeGroups() {
   var majors = groupCategoriesByMajor(DATA.categories);
   return majors.map(function (major) {
-    var html = '<div class="major-head"><span class="major-title">' + escapeHtml(major.name) + '</span></div>';
-    html += major.ungrouped.map(renderOrgBlock).join('');
-    html += major.midGroups.map(function (mg) {
-      return '<div class="mid-head"><span class="mid-title">' + escapeHtml(mg.name) + '</span></div>' + mg.orgs.map(renderOrgBlock).join('');
+    var inner = major.ungrouped.map(renderOrgBlock).join('');
+    inner += major.midGroups.map(function (mg) {
+      return (
+        '<div class="mid-head"><span class="mid-title">' + escapeHtml(mg.name) + '</span></div>' +
+        '<div class="mid-body">' + mg.orgs.map(renderOrgBlock).join('') + '</div>'
+      );
     }).join('');
-    return html;
+    return (
+      '<div class="major-section">' +
+        '<div class="major-title">' + escapeHtml(major.name) + '</div>' +
+        '<div class="major-body">' + inner + '</div>' +
+      '</div>'
+    );
   }).join('');
 }
 // Renders the home screen's body (everything below the search box).
